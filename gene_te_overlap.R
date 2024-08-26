@@ -1,0 +1,161 @@
+library(topGO)
+
+
+############################################
+#        function for topGO enrichment     #
+############################################
+
+get_enriched_terms<-function(gene_list, mappings, return_sample_GOData=FALSE){
+  # use the gene 2 GOterms mapping provided for D. incarnata
+  geneID2GO<-mappings
+  # the input genes form the input, use these to annotate all genes, 1 is present in input list, 0 is absent
+  geneSel<-gene_list
+  geneSel<-factor(as.integer(names(geneID2GO) %in% geneSel))
+  names(geneSel)<-names(geneID2GO)
+  
+  # set up the topGO object
+  sampleGOdata <- new("topGOdata",
+                      ontology = "BP",
+                      allGenes = geneSel, 
+                      nodeSize = 10,
+                      annot = annFUN.gene2GO,
+                      gene2GO = geneID2GO)
+  
+  # run three tests, fisher, Kol-Smirn, and Kol-Smirn with elimination
+  resultFisher <- runTest(sampleGOdata, algorithm = "weight01", statistic = "fisher")
+  
+  # generate summary tane and return it
+  allRes <- GenTable(sampleGOdata, classicFisher = resultFisher,
+                     orderBy = "classicFisher", ranksOf = "classicFisher", topNodes = 100,
+                     numChar=1000 )
+  #allRes<-GenTable(sampleGOdata, Fis = resultFisher, topNodes = 20)
+  
+  if (return_sample_GOData == TRUE){
+    return(list(result=allRes, goData=sampleGOdata))
+  } else {
+    return(allRes)
+  }
+}
+
+
+############################################
+#        load in the GO ID mappings        #
+############################################
+
+# for the GO term enrichment tests
+mp_impolita<-readMappings("impolita_topGO_annotation.txt")
+mp_vieillardii<-readMappings("vieillardii_topGO_annotation.txt")
+mp_pancheri<-readMappings("pancheri_topGO_annotation.txt")
+mp_revolutissima<-readMappings("revolutissima_topGO_annotation.txt")
+mp_yahouensis<-readMappings("yahouensis_topGO_annotation.txt")
+
+
+
+#############################################################
+#    read in annotation of genes within 5KB of a TE         #
+#############################################################
+
+
+pancheri.cactaTIR5000<-read_delim("annotation5000/pancheri.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="cactaTIR")
+pancheri.copiaLTR5000<-read_delim("annotation5000/pancheri.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="copiaLTR")
+pancheri.gypsyLTR5000<-read_delim("annotation5000/pancheri.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="gypsyLTR")
+pancheri.harbingerTIR5000<-read_delim("annotation5000/pancheri.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="harbingerTIR")
+pancheri.helitron5000<-read_delim("annotation5000/pancheri.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="helitron")
+pancheri.marinerTIR5000<-read_delim("annotation5000/pancheri.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="marinerTIR")
+pancheri.mutatorTIR5000<-read_delim("annotation5000/pancheri.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="mutatorTIR")
+
+revolutissima.cactaTIR5000<-read_delim("annotation5000/revolutissima.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="cactaTIR")
+revolutissima.copiaLTR5000<-read_delim("annotation5000/revolutissima.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="copiaLTR")
+revolutissima.gypsyLTR5000<-read_delim("annotation5000/revolutissima.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="gypsyLTR")
+revolutissima.harbingerTIR5000<-read_delim("annotation5000/revolutissima.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="harbingerTIR")
+revolutissima.helitron5000<-read_delim("annotation5000/revolutissima.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="helitron")
+revolutissima.marinerTIR5000<-read_delim("annotation5000/revolutissima.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="marinerTIR")
+revolutissima.mutatorTIR5000<-read_delim("annotation5000/revolutissima.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="mutatorTIR")
+
+vieillardii.cactaTIR5000<-read_delim("annotation5000/vieillardii.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="cactaTIR")
+vieillardii.copiaLTR5000<-read_delim("annotation5000/vieillardii.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="copiaLTR")
+vieillardii.gypsyLTR5000<-read_delim("annotation5000/vieillardii.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="gypsyLTR")
+vieillardii.harbingerTIR5000<-read_delim("annotation5000/vieillardii.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="harbingerTIR")
+vieillardii.helitron5000<-read_delim("annotation5000/vieillardii.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="helitron")
+vieillardii.marinerTIR5000<-read_delim("annotation5000/vieillardii.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="marinerTIR")
+vieillardii.mutatorTIR5000<-read_delim("annotation5000/vieillardii.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="mutatorTIR")
+
+yahouensis.cactaTIR5000<-read_delim("annotation5000/yahouensis.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="cactaTIR")
+yahouensis.copiaLTR5000<-read_delim("annotation5000/yahouensis.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="copiaLTR")
+yahouensis.gypsyLTR5000<-read_delim("annotation5000/yahouensis.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="gypsyLTR")
+yahouensis.harbingerTIR5000<-read_delim("annotation5000/yahouensis.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="harbingerTIR")
+yahouensis.helitron5000<-read_delim("annotation5000/yahouensis.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="helitron")
+yahouensis.marinerTIR5000<-read_delim("annotation5000/yahouensis.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="marinerTIR")
+yahouensis.mutatorTIR5000<-read_delim("annotation5000/yahouensis.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="mutatorTIR")
+
+
+impolita.cactaTIR_window5000<-read_delim("annotation5000/impolita.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="cactaTIR")
+impolita.copiaLTR_window5000<-read_delim("annotation5000/impolita.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="copiaLTR")
+impolita.gypsyLTR_window5000<-read_delim("annotation5000/impolita.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="gypsyLTR")
+impolita.harbingerTIR_window5000<-read_delim("annotation5000/impolita.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="harbingerTIR")
+impolita.helitron_window5000<-read_delim("annotation5000/impolita.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="helitron")
+impolita.marinerTIR_window5000<-read_delim("annotation5000/impolita.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="marinerTIR")
+impolita.mutatorTIR_window5000<-read_delim("annotation5000/impolita.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="mutatorTIR")
+
+
+
+
+pancheri.cactaTIR5000_go<-get_enriched_terms(pancheri.cactaTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+pancheri.copiaLTR5000_go<-get_enriched_terms(pancheri.copiaLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+pancheri.gypsyLTR5000_go<-get_enriched_terms(pancheri.gypsyLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+pancheri.harbingerTIR5000_go<-get_enriched_terms(pancheri.harbingerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+pancheri.helitron5000_go<-get_enriched_terms(pancheri.helitron5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+pancheri.marinerTIR5000_go<-get_enriched_terms(pancheri.marinerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+pancheri.mutatorTIR5000_go<-get_enriched_terms(pancheri.mutatorTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+
+
+revolutissima.cactaTIR5000_go<-get_enriched_terms(revolutissima.cactaTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.copiaLTR5000_go<-get_enriched_terms(revolutissima.copiaLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.gypsyLTR5000_go<-get_enriched_terms(revolutissima.gypsyLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.harbingerTIR5000_go<-get_enriched_terms(revolutissima.harbingerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.helitron5000_go<-get_enriched_terms(revolutissima.helitron5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.marinerTIR5000_go<-get_enriched_terms(revolutissima.marinerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.mutatorTIR5000_go<-get_enriched_terms(revolutissima.mutatorTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+
+
+vieillardii.cactaTIR5000_go<-get_enriched_terms(vieillardii.cactaTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+vieillardii.copiaLTR5000_go<-get_enriched_terms(vieillardii.copiaLTR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+vieillardii.gypsyLTR5000_go<-get_enriched_terms(vieillardii.gypsyLTR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+vieillardii.harbingerTIR5000_go<-get_enriched_terms(vieillardii.harbingerTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+vieillardii.helitron5000_go<-get_enriched_terms(vieillardii.helitron5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+vieillardii.marinerTIR5000_go<-get_enriched_terms(vieillardii.marinerTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+vieillardii.mutatorTIR5000_go<-get_enriched_terms(vieillardii.mutatorTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+
+
+yahouensis.copiaLTR5000_go<-get_enriched_terms(yahouensis.copiaLTR5000$X1, mp_yahouensis) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+yahouensis.gypsyLTR5000_go<-get_enriched_terms(yahouensis.gypsyLTR5000$X1, mp_yahouensis) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+
+
+impolita.cactaTIR5000_go<-get_enriched_terms(impolita.cactaTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+impolita.copiaLTR5000_go<-get_enriched_terms(impolita.copiaLTR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+impolita.gypsyLTR5000_go<-get_enriched_terms(impolita.gypsyLTR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+impolita.harbingerTIR5000_go<-get_enriched_terms(impolita.harbingerTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+impolita.marinerTIR5000_go<-get_enriched_terms(impolita.marinerTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+impolita.mutatorTIR5000_go<-get_enriched_terms(impolita.mutatorTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+
+
+
+yahou-impo same soil
+
+
+impo-revo sister
+
+
+# yahou-panch sister
+intersect(yahouensis.gypsyLTR5000_go$Term, pancheri.gypsyLTR5000_go$Term)
+
+# yahou-impo same soil (volcanic)
+intersect(yahouensis.gypsyLTR5000_go$Term, impolita.gypsyLTR5000_go$Term)
+
+# panch-revo same soil (ultramafic)
+intersect(pancheri.gypsyLTR5000_go$Term, revolutissima.gypsyLTR5000_go$Term)
+
+# impo-revo sister
+intersect(impolita.gypsyLTR5000_go$Term, revolutissima.gypsyLTR5000_go$Term)
+
+
