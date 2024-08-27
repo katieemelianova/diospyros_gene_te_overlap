@@ -1,4 +1,8 @@
 library(topGO)
+library(dplyr)
+library(magrittr)
+library(readr)
+library(stringr)
 
 
 ############################################
