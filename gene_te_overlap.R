@@ -144,12 +144,6 @@ impolita.mutatorTIR5000_go<-get_enriched_terms(impolita.mutatorTIR_window5000$X1
 
 
 
-yahou-impo same soil
-
-
-impo-revo sister
-
-
 # yahou-panch sister
 intersect(yahouensis.gypsyLTR5000_go$Term, pancheri.gypsyLTR5000_go$Term)
 
