@@ -41,6 +41,24 @@ get_enriched_terms<-function(gene_list, mappings, return_sample_GOData=FALSE){
   }
 }
 
+##############################################################
+#       function to get genes underlying enriched terms      #
+##############################################################
+
+get_de_genes_in_term<-function(degs, go_term, go_data){
+  genes_in_term<-genesInTerm(go_data, go_term)[[1]]
+  degs_in_term<-intersect(genes_in_term, degs)
+  return(degs_in_term)
+}
+
+###############################################
+#       function to filter topGO object        #
+###############################################
+
+filter_topGO<-function(topgo_object){
+  return(topgo_object$result %>% filter(classicFisher < 0.05))
+}
+
 
 ############################################
 #        load in the GO ID mappings        #
@@ -93,68 +111,83 @@ yahouensis.marinerTIR5000<-read_delim("yahouensis/yahouensis.gene_marinerTIR_win
 yahouensis.mutatorTIR5000<-read_delim("yahouensis/yahouensis.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="mutatorTIR")
 
 
-impolita.cactaTIR_window5000<-read_delim("impolita/impolita.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="cactaTIR")
-impolita.copiaLTR_window5000<-read_delim("impolita/impolita.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="copiaLTR")
-impolita.gypsyLTR_window5000<-read_delim("impolita/impolita.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="gypsyLTR")
-impolita.harbingerTIR_window5000<-read_delim("impolita/impolita.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="harbingerTIR")
-impolita.helitron_window5000<-read_delim("impolita/impolita.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="helitron")
-impolita.marinerTIR_window5000<-read_delim("impolita/impolita.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="marinerTIR")
-impolita.mutatorTIR_window5000<-read_delim("impolita/impolita.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="mutatorTIR")
+impolita.cactaTIR5000<-read_delim("impolita/impolita.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="cactaTIR")
+impolita.copiaLTR5000<-read_delim("impolita/impolita.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="copiaLTR")
+impolita.gypsyLTR5000<-read_delim("impolita/impolita.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="gypsyLTR")
+impolita.harbingerTIR5000<-read_delim("impolita/impolita.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="harbingerTIR")
+impolita.helitron5000<-read_delim("impolita/impolita.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="helitron")
+impolita.marinerTIR5000<-read_delim("impolita/impolita.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="marinerTIR")
+impolita.mutatorTIR5000<-read_delim("impolita/impolita.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="mutatorTIR")
+
+########################################################################
+#       get the go enrichments and objects of closely related genes    #
+########################################################################
 
 
+pancheri.cactaTIR5000_go<-get_enriched_terms(pancheri.cactaTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.copiaLTR5000_go<-get_enriched_terms(pancheri.copiaLTR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.gypsyLTR5000_go<-get_enriched_terms(pancheri.gypsyLTR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.harbingerTIR5000_go<-get_enriched_terms(pancheri.harbingerTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.helitron5000_go<-get_enriched_terms(pancheri.helitron5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.marinerTIR5000_go<-get_enriched_terms(pancheri.marinerTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.mutatorTIR5000_go<-get_enriched_terms(pancheri.mutatorTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
 
 
-pancheri.cactaTIR5000_go<-get_enriched_terms(pancheri.cactaTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-pancheri.copiaLTR5000_go<-get_enriched_terms(pancheri.copiaLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-pancheri.gypsyLTR5000_go<-get_enriched_terms(pancheri.gypsyLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-pancheri.harbingerTIR5000_go<-get_enriched_terms(pancheri.harbingerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-pancheri.helitron5000_go<-get_enriched_terms(pancheri.helitron5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-pancheri.marinerTIR5000_go<-get_enriched_terms(pancheri.marinerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-pancheri.mutatorTIR5000_go<-get_enriched_terms(pancheri.mutatorTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+revolutissima.cactaTIR5000_go<-get_enriched_terms(revolutissima.cactaTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.copiaLTR5000_go<-get_enriched_terms(revolutissima.copiaLTR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.gypsyLTR5000_go<-get_enriched_terms(revolutissima.gypsyLTR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.harbingerTIR5000_go<-get_enriched_terms(revolutissima.harbingerTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.helitron5000_go<-get_enriched_terms(revolutissima.helitron5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.marinerTIR5000_go<-get_enriched_terms(revolutissima.marinerTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.mutatorTIR5000_go<-get_enriched_terms(revolutissima.mutatorTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+
+vieillardii.cactaTIR5000_go<-get_enriched_terms(vieillardii.cactaTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.copiaLTR5000_go<-get_enriched_terms(vieillardii.copiaLTR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.gypsyLTR5000_go<-get_enriched_terms(vieillardii.gypsyLTR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.harbingerTIR5000_go<-get_enriched_terms(vieillardii.harbingerTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.helitron5000_go<-get_enriched_terms(vieillardii.helitron5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.marinerTIR5000_go<-get_enriched_terms(vieillardii.marinerTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.mutatorTIR5000_go<-get_enriched_terms(vieillardii.mutatorTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
 
 
-revolutissima.cactaTIR5000_go<-get_enriched_terms(revolutissima.cactaTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-revolutissima.copiaLTR5000_go<-get_enriched_terms(revolutissima.copiaLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-revolutissima.gypsyLTR5000_go<-get_enriched_terms(revolutissima.gypsyLTR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-revolutissima.harbingerTIR5000_go<-get_enriched_terms(revolutissima.harbingerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-revolutissima.helitron5000_go<-get_enriched_terms(revolutissima.helitron5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-revolutissima.marinerTIR5000_go<-get_enriched_terms(revolutissima.marinerTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-revolutissima.mutatorTIR5000_go<-get_enriched_terms(revolutissima.mutatorTIR5000$X1, mp_pancheri) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+yahouensis.copiaLTR5000_go<-get_enriched_terms(yahouensis.copiaLTR5000$X1, mp_yahouensis, return_sample_GOData=TRUE)
+yahouensis.gypsyLTR5000_go<-get_enriched_terms(yahouensis.gypsyLTR5000$X1, mp_yahouensis, return_sample_GOData=TRUE)
 
 
-vieillardii.cactaTIR5000_go<-get_enriched_terms(vieillardii.cactaTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-vieillardii.copiaLTR5000_go<-get_enriched_terms(vieillardii.copiaLTR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-vieillardii.gypsyLTR5000_go<-get_enriched_terms(vieillardii.gypsyLTR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-vieillardii.harbingerTIR5000_go<-get_enriched_terms(vieillardii.harbingerTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-vieillardii.helitron5000_go<-get_enriched_terms(vieillardii.helitron5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-vieillardii.marinerTIR5000_go<-get_enriched_terms(vieillardii.marinerTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-vieillardii.mutatorTIR5000_go<-get_enriched_terms(vieillardii.mutatorTIR5000$X1, mp_vieillardii) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+impolita.cactaTIR5000_go<-get_enriched_terms(impolita.cactaTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.copiaLTR5000_go<-get_enriched_terms(impolita.copiaLTR5000$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.gypsyLTR5000_go<-get_enriched_terms(impolita.gypsyLTR5000$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.harbingerTIR5000_go<-get_enriched_terms(impolita.harbingerTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.marinerTIR5000_go<-get_enriched_terms(impolita.marinerTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.mutatorTIR5000_go<-get_enriched_terms(impolita.mutatorTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
 
 
-yahouensis.copiaLTR5000_go<-get_enriched_terms(yahouensis.copiaLTR5000$X1, mp_yahouensis) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-yahouensis.gypsyLTR5000_go<-get_enriched_terms(yahouensis.gypsyLTR5000$X1, mp_yahouensis) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+yahouensis.gypsyLTR5000_go$result %>% filter(classicFisher < 0.05)
+
+yahouensis.gypsyLTR5000_go$goData
 
 
-impolita.cactaTIR5000_go<-get_enriched_terms(impolita.cactaTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-impolita.copiaLTR5000_go<-get_enriched_terms(impolita.copiaLTR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-impolita.gypsyLTR5000_go<-get_enriched_terms(impolita.gypsyLTR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-impolita.harbingerTIR5000_go<-get_enriched_terms(impolita.harbingerTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-impolita.marinerTIR5000_go<-get_enriched_terms(impolita.marinerTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
-impolita.mutatorTIR5000_go<-get_enriched_terms(impolita.mutatorTIR_window5000$X1, mp_impolita) %>% filter(as.numeric(classicFisher) < 0.05 & Significant/Annotated > 0.2)
+genesInTerm(yahouensis.gypsyLTR5000_go$goData, c("GO:0042127", "GO:0001522"))
 
-
+get_de_genes_in_term(yahouensis.gypsyLTR5000$X1, "GO:0042127", yahouensis.gypsyLTR5000_go$goData)
 
 # yahou-panch sister
-intersect(yahouensis.gypsyLTR5000_go$Term, pancheri.gypsyLTR5000_go$Term)
+intersect(filter_topGO(yahouensis.gypsyLTR5000_go)$Term, filter_topGO(pancheri.gypsyLTR5000_go)$Term)
 
 # yahou-impo same soil (volcanic)
-intersect(yahouensis.gypsyLTR5000_go$Term, impolita.gypsyLTR5000_go$Term)
+intersect(filter_topGO(yahouensis.gypsyLTR5000_go)$Term, filter_topGO(impolita.gypsyLTR5000_go)$Term)
 
 # impo-revo sister
-intersect(impolita.gypsyLTR5000_go$Term, revolutissima.gypsyLTR5000_go$Term)
+intersect(impolita.gypsyLTR5000_go$result$Term, revolutissima.gypsyLTR5000_go$result$Term)
 
 # panch-revo same soil (ultramafic)
-intersect(pancheri.gypsyLTR5000_go$Term, revolutissima.gypsyLTR5000_go$Term)
+intersect(pancheri.gypsyLTR5000_go$result$Term, revolutissima.gypsyLTR5000_go$result$Term)
+
+
+get_de_genes_in_term(pancheri.gypsyLTR5000$X1, "GO:0015689", pancheri.gypsyLTR5000_go$goData)
+get_de_genes_in_term(revolutissima.gypsyLTR5000$X1, "GO:0015689", revolutissima.gypsyLTR5000_go$goData)
+
+
 
 
 
