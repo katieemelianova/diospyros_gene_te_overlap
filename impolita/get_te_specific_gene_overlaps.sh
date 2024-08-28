@@ -1,9 +1,10 @@
 
-#########################################
-#              set species name         #
-#########################################
+#########################################################
+#              set species name and window width        #
+#########################################################
 
 species="impolita"
+window="1000"
 
 #########################################
 #             symlink relevant files    #
@@ -40,26 +41,25 @@ grep "Gypsy_LTR_retrotransposon" $species.fasta.mod.EDTA.intact.gff3 > $species.
 #     use bedtools window to get TEs in 10KB window around genes  #
 ###################################################################
 
-
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.helitron.gff3 > $species.gene_helitron_window5000.gff3
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.cactaTIR.gff3 > $species.gene_cactaTIR_window5000.gff3
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.harbingerTIR.gff3 > $species.gene_harbingerTIR_window5000.gff3
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.marinerTIR.gff3 > $species.gene_marinerTIR_window5000.gff3
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.mutatorTIR.gff3 > $species.gene_mutatorTIR_window5000.gff3
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.copiaLTR.gff3 > $species.gene_copiaLTR_window5000.gff3
-bedtools window -w 5000 -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.gypsyLTR.gff3 > $species.gene_gypsyLTR_window5000.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.helitron.gff3 > $species.gene_helitron_window$window.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.cactaTIR.gff3 > $species.gene_cactaTIR_window$window.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.harbingerTIR.gff3 > $species.gene_harbingerTIR_window$window.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.marinerTIR.gff3 > $species.gene_marinerTIR_window$window.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.mutatorTIR.gff3 > $species.gene_mutatorTIR_window$window.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.copiaLTR.gff3 > $species.gene_copiaLTR_window$window.gff3
+bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.gypsyLTR.gff3 > $species.gene_gypsyLTR_window$window.gff3
 
 ###################################################################
 #                   extract genes with TE within 5KB              #
 ###################################################################
 
-cut -f 9 $species.gene_helitron_window5000.gff3 > $species.gene_helitron_window5000.genes
-cut -f 9 $species.gene_cactaTIR_window5000.gff3 > $species.gene_cactaTIR_window5000.genes
-cut -f 9 $species.gene_harbingerTIR_window5000.gff3 > $species.gene_harbingerTIR_window5000.genes
-cut -f 9 $species.gene_marinerTIR_window5000.gff3 > $species.gene_marinerTIR_window5000.genes
-cut -f 9 $species.gene_mutatorTIR_window5000.gff3 > $species.gene_mutatorTIR_window5000.genes
-cut -f 9 $species.gene_copiaLTR_window5000.gff3 > $species.gene_copiaLTR_window5000.genes
-cut -f 9 $species.gene_gypsyLTR_window5000.gff3 > $species.gene_gypsyLTR_window5000.genes
+cut -f 9 $species.gene_helitron_window$window.gff3 > $species.gene_helitron_window$window.genes
+cut -f 9 $species.gene_cactaTIR_window$window.gff3 > $species.gene_cactaTIR_window$window.genes
+cut -f 9 $species.gene_harbingerTIR_window$window.gff3 > $species.gene_harbingerTIR_window$window.genes
+cut -f 9 $species.gene_marinerTIR_window$window.gff3 > $species.gene_marinerTIR_window$window.genes
+cut -f 9 $species.gene_mutatorTIR_window$window.gff3 > $species.gene_mutatorTIR_window$window.genes
+cut -f 9 $species.gene_copiaLTR_window$window.gff3 > $species.gene_copiaLTR_window$window.genes
+cut -f 9 $species.gene_gypsyLTR_window$window.gff3 > $species.gene_gypsyLTR_window$window.genes
 
 
 ###################################################################
@@ -68,13 +68,17 @@ cut -f 9 $species.gene_gypsyLTR_window5000.gff3 > $species.gene_gypsyLTR_window5
 
 annotation_file="/lisc/scratch/botany/katie/annotation/braker3/$species/gfap_annotation/GO_database_result.txt"
 
-while read i; do grep $i $annotation_file; done < $species.gene_helitron_window5000.genes | grep "biological_process" > $species.gene_helitron_window5000.annotation
-while read i; do grep $i $annotation_file; done < $species.gene_cactaTIR_window5000.genes | grep "biological_process" > $species.gene_cactaTIR_window5000.annotation
-while read i; do grep $i $annotation_file; done < $species.gene_harbingerTIR_window5000.genes | grep "biological_process" > $species.gene_harbingerTIR_window5000.annotation
-while read i; do grep $i $annotation_file; done < $species.gene_marinerTIR_window5000.genes | grep "biological_process" > $species.gene_marinerTIR_window5000.annotation
-while read i; do grep $i $annotation_file; done < $species.gene_mutatorTIR_window5000.genes | grep "biological_process" > $species.gene_mutatorTIR_window5000.annotation
-while read i; do grep $i $annotation_file; done < $species.gene_copiaLTR_window5000.genes | grep "biological_process" > $species.gene_copiaLTR_window5000.annotation
-while read i; do grep $i $annotation_file; done < $species.gene_gypsyLTR_window5000.genes | grep "biological_process" > $species.gene_gypsyLTR_window5000.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_helitron_window$window.genes | grep "biological_process" > $species.gene_helitron_window$window.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_cactaTIR_window$window.genes | grep "biological_process" > $species.gene_cactaTIR_window$window.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_harbingerTIR_window$window.genes | grep "biological_process" > $species.gene_harbingerTIR_window$window.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_marinerTIR_window$window.genes | grep "biological_process" > $species.gene_marinerTIR_window$window.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_mutatorTIR_window$window.genes | grep "biological_process" > $species.gene_mutatorTIR_window$window.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_copiaLTR_window$window.genes | grep "biological_process" > $species.gene_copiaLTR_window$window.annotation
+while read i; do grep $i $annotation_file; done < $species.gene_gypsyLTR_window$window.genes | grep "biological_process" > $species.gene_gypsyLTR_window$window.annotation
+
+########################################
+#             cleanup                  #
+########################################
 
 
-
+rm *window*genes *window*gff3
