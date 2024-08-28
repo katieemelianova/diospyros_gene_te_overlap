@@ -78,114 +78,161 @@ mp_yahouensis<-readMappings("yahouensis_topGO_annotation.txt")
 #############################################################
 
 
-pancheri.cactaTIR5000<-read_delim("pancheri/pancheri.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="cactaTIR")
-pancheri.copiaLTR5000<-read_delim("pancheri/pancheri.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="copiaLTR")
-pancheri.gypsyLTR5000<-read_delim("pancheri/pancheri.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="gypsyLTR")
-pancheri.harbingerTIR5000<-read_delim("pancheri/pancheri.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="harbingerTIR")
-pancheri.helitron5000<-read_delim("pancheri/pancheri.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="helitron")
-pancheri.marinerTIR5000<-read_delim("pancheri/pancheri.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="marinerTIR")
-pancheri.mutatorTIR5000<-read_delim("pancheri/pancheri.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="mutatorTIR")
+pancheri.cactaTIR<-read_delim("pancheri/pancheri.gene_cactaTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="cactaTIR")
+pancheri.copiaLTR<-read_delim("pancheri/pancheri.gene_copiaLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="copiaLTR")
+pancheri.gypsyLTR<-read_delim("pancheri/pancheri.gene_gypsyLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="gypsyLTR")
+pancheri.harbingerTIR<-read_delim("pancheri/pancheri.gene_harbingerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="harbingerTIR")
+pancheri.helitron<-read_delim("pancheri/pancheri.gene_helitron_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="helitron")
+pancheri.marinerTIR<-read_delim("pancheri/pancheri.gene_marinerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="marinerTIR")
+pancheri.mutatorTIR<-read_delim("pancheri/pancheri.gene_mutatorTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="pancheri", te_class="mutatorTIR")
 
-revolutissima.cactaTIR5000<-read_delim("revolutissima/revolutissima.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="cactaTIR")
-revolutissima.copiaLTR5000<-read_delim("revolutissima/revolutissima.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="copiaLTR")
-revolutissima.gypsyLTR5000<-read_delim("revolutissima/revolutissima.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="gypsyLTR")
-revolutissima.harbingerTIR5000<-read_delim("revolutissima/revolutissima.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="harbingerTIR")
-revolutissima.helitron5000<-read_delim("revolutissima/revolutissima.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="helitron")
-revolutissima.marinerTIR5000<-read_delim("revolutissima/revolutissima.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="marinerTIR")
-revolutissima.mutatorTIR5000<-read_delim("revolutissima/revolutissima.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="mutatorTIR")
+revolutissima.cactaTIR<-read_delim("revolutissima/revolutissima.gene_cactaTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="cactaTIR")
+revolutissima.copiaLTR<-read_delim("revolutissima/revolutissima.gene_copiaLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="copiaLTR")
+revolutissima.gypsyLTR<-read_delim("revolutissima/revolutissima.gene_gypsyLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="gypsyLTR")
+revolutissima.harbingerTIR<-read_delim("revolutissima/revolutissima.gene_harbingerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="harbingerTIR")
+revolutissima.helitron<-read_delim("revolutissima/revolutissima.gene_helitron_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="helitron")
+revolutissima.marinerTIR<-read_delim("revolutissima/revolutissima.gene_marinerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="marinerTIR")
+revolutissima.mutatorTIR<-read_delim("revolutissima/revolutissima.gene_mutatorTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="revolutissima", te_class="mutatorTIR")
 
-vieillardii.cactaTIR5000<-read_delim("viellardiei/vieillardii.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="cactaTIR")
-vieillardii.copiaLTR5000<-read_delim("viellardiei/vieillardii.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="copiaLTR")
-vieillardii.gypsyLTR5000<-read_delim("viellardiei/vieillardii.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="gypsyLTR")
-vieillardii.harbingerTIR5000<-read_delim("viellardiei/vieillardii.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="harbingerTIR")
-vieillardii.helitron5000<-read_delim("viellardiei/vieillardii.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="helitron")
-vieillardii.marinerTIR5000<-read_delim("viellardiei/vieillardii.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="marinerTIR")
-vieillardii.mutatorTIR5000<-read_delim("viellardiei/vieillardii.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="mutatorTIR")
+vieillardii.cactaTIR<-read_delim("viellardiei/vieillardii.gene_cactaTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="cactaTIR")
+vieillardii.copiaLTR<-read_delim("viellardiei/vieillardii.gene_copiaLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="copiaLTR")
+vieillardii.gypsyLTR<-read_delim("viellardiei/vieillardii.gene_gypsyLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="gypsyLTR")
+vieillardii.harbingerTIR<-read_delim("viellardiei/vieillardii.gene_harbingerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="harbingerTIR")
+vieillardii.helitron<-read_delim("viellardiei/vieillardii.gene_helitron_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="helitron")
+vieillardii.marinerTIR<-read_delim("viellardiei/vieillardii.gene_marinerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="marinerTIR")
+vieillardii.mutatorTIR<-read_delim("viellardiei/vieillardii.gene_mutatorTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="vieillardii", te_class="mutatorTIR")
 
-yahouensis.cactaTIR5000<-read_delim("yahouensis/yahouensis.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="cactaTIR")
-yahouensis.copiaLTR5000<-read_delim("yahouensis/yahouensis.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="copiaLTR")
-yahouensis.gypsyLTR5000<-read_delim("yahouensis/yahouensis.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="gypsyLTR")
-yahouensis.harbingerTIR5000<-read_delim("yahouensis/yahouensis.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="harbingerTIR")
-yahouensis.helitron5000<-read_delim("yahouensis/yahouensis.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="helitron")
-yahouensis.marinerTIR5000<-read_delim("yahouensis/yahouensis.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="marinerTIR")
-yahouensis.mutatorTIR5000<-read_delim("yahouensis/yahouensis.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="mutatorTIR")
+yahouensis.cactaTIR<-read_delim("yahouensis/yahouensis.gene_cactaTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="cactaTIR")
+yahouensis.copiaLTR<-read_delim("yahouensis/yahouensis.gene_copiaLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="copiaLTR")
+yahouensis.gypsyLTR<-read_delim("yahouensis/yahouensis.gene_gypsyLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="gypsyLTR")
+yahouensis.harbingerTIR<-read_delim("yahouensis/yahouensis.gene_harbingerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="harbingerTIR")
+yahouensis.helitron<-read_delim("yahouensis/yahouensis.gene_helitron_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="helitron")
+yahouensis.marinerTIR<-read_delim("yahouensis/yahouensis.gene_marinerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="marinerTIR")
+yahouensis.mutatorTIR<-read_delim("yahouensis/yahouensis.gene_mutatorTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="yahouensis", te_class="mutatorTIR")
 
 
-impolita.cactaTIR5000<-read_delim("impolita/impolita.gene_cactaTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="cactaTIR")
-impolita.copiaLTR5000<-read_delim("impolita/impolita.gene_copiaLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="copiaLTR")
-impolita.gypsyLTR5000<-read_delim("impolita/impolita.gene_gypsyLTR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="gypsyLTR")
-impolita.harbingerTIR5000<-read_delim("impolita/impolita.gene_harbingerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="harbingerTIR")
-impolita.helitron5000<-read_delim("impolita/impolita.gene_helitron_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="helitron")
-impolita.marinerTIR5000<-read_delim("impolita/impolita.gene_marinerTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="marinerTIR")
-impolita.mutatorTIR5000<-read_delim("impolita/impolita.gene_mutatorTIR_window5000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="mutatorTIR")
+impolita.cactaTIR<-read_delim("impolita/impolita.gene_cactaTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="cactaTIR")
+impolita.copiaLTR<-read_delim("impolita/impolita.gene_copiaLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="copiaLTR")
+impolita.gypsyLTR<-read_delim("impolita/impolita.gene_gypsyLTR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="gypsyLTR")
+impolita.harbingerTIR<-read_delim("impolita/impolita.gene_harbingerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="harbingerTIR")
+impolita.helitron<-read_delim("impolita/impolita.gene_helitron_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="helitron")
+impolita.marinerTIR<-read_delim("impolita/impolita.gene_marinerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="marinerTIR")
+impolita.mutatorTIR<-read_delim("impolita/impolita.gene_mutatorTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="mutatorTIR")
 
 ########################################################################
 #       get the go enrichments and objects of closely related genes    #
 ########################################################################
 
 
-pancheri.cactaTIR5000_go<-get_enriched_terms(pancheri.cactaTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
-pancheri.copiaLTR5000_go<-get_enriched_terms(pancheri.copiaLTR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
-pancheri.gypsyLTR5000_go<-get_enriched_terms(pancheri.gypsyLTR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
-pancheri.harbingerTIR5000_go<-get_enriched_terms(pancheri.harbingerTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
-pancheri.helitron5000_go<-get_enriched_terms(pancheri.helitron5000$X1, mp_pancheri, return_sample_GOData=TRUE)
-pancheri.marinerTIR5000_go<-get_enriched_terms(pancheri.marinerTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
-pancheri.mutatorTIR5000_go<-get_enriched_terms(pancheri.mutatorTIR5000$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.cactaTIR_go<-get_enriched_terms(pancheri.cactaTIR$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.copiaLTR_go<-get_enriched_terms(pancheri.copiaLTR$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.gypsyLTR_go<-get_enriched_terms(pancheri.gypsyLTR$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.harbingerTIR_go<-get_enriched_terms(pancheri.harbingerTIR$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.helitron_go<-get_enriched_terms(pancheri.helitron$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.marinerTIR_go<-get_enriched_terms(pancheri.marinerTIR$X1, mp_pancheri, return_sample_GOData=TRUE)
+pancheri.mutatorTIR_go<-get_enriched_terms(pancheri.mutatorTIR$X1, mp_pancheri, return_sample_GOData=TRUE)
 
 
-revolutissima.cactaTIR5000_go<-get_enriched_terms(revolutissima.cactaTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
-revolutissima.copiaLTR5000_go<-get_enriched_terms(revolutissima.copiaLTR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
-revolutissima.gypsyLTR5000_go<-get_enriched_terms(revolutissima.gypsyLTR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
-revolutissima.harbingerTIR5000_go<-get_enriched_terms(revolutissima.harbingerTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
-revolutissima.helitron5000_go<-get_enriched_terms(revolutissima.helitron5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
-revolutissima.marinerTIR5000_go<-get_enriched_terms(revolutissima.marinerTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
-revolutissima.mutatorTIR5000_go<-get_enriched_terms(revolutissima.mutatorTIR5000$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.cactaTIR_go<-get_enriched_terms(revolutissima.cactaTIR$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.copiaLTR_go<-get_enriched_terms(revolutissima.copiaLTR$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.gypsyLTR_go<-get_enriched_terms(revolutissima.gypsyLTR$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.harbingerTIR_go<-get_enriched_terms(revolutissima.harbingerTIR$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.helitron_go<-get_enriched_terms(revolutissima.helitron$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.marinerTIR_go<-get_enriched_terms(revolutissima.marinerTIR$X1, mp_revolutissima, return_sample_GOData=TRUE)
+revolutissima.mutatorTIR_go<-get_enriched_terms(revolutissima.mutatorTIR$X1, mp_revolutissima, return_sample_GOData=TRUE)
 
-vieillardii.cactaTIR5000_go<-get_enriched_terms(vieillardii.cactaTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-vieillardii.copiaLTR5000_go<-get_enriched_terms(vieillardii.copiaLTR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-vieillardii.gypsyLTR5000_go<-get_enriched_terms(vieillardii.gypsyLTR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-vieillardii.harbingerTIR5000_go<-get_enriched_terms(vieillardii.harbingerTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-vieillardii.helitron5000_go<-get_enriched_terms(vieillardii.helitron5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-vieillardii.marinerTIR5000_go<-get_enriched_terms(vieillardii.marinerTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-vieillardii.mutatorTIR5000_go<-get_enriched_terms(vieillardii.mutatorTIR5000$X1, mp_vieillardii, return_sample_GOData=TRUE)
-
-
-yahouensis.copiaLTR5000_go<-get_enriched_terms(yahouensis.copiaLTR5000$X1, mp_yahouensis, return_sample_GOData=TRUE)
-yahouensis.gypsyLTR5000_go<-get_enriched_terms(yahouensis.gypsyLTR5000$X1, mp_yahouensis, return_sample_GOData=TRUE)
+vieillardii.cactaTIR_go<-get_enriched_terms(vieillardii.cactaTIR$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.copiaLTR_go<-get_enriched_terms(vieillardii.copiaLTR$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.gypsyLTR_go<-get_enriched_terms(vieillardii.gypsyLTR$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.harbingerTIR_go<-get_enriched_terms(vieillardii.harbingerTIR$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.helitron_go<-get_enriched_terms(vieillardii.helitron$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.marinerTIR_go<-get_enriched_terms(vieillardii.marinerTIR$X1, mp_vieillardii, return_sample_GOData=TRUE)
+vieillardii.mutatorTIR_go<-get_enriched_terms(vieillardii.mutatorTIR$X1, mp_vieillardii, return_sample_GOData=TRUE)
 
 
-impolita.cactaTIR5000_go<-get_enriched_terms(impolita.cactaTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
-impolita.copiaLTR5000_go<-get_enriched_terms(impolita.copiaLTR5000$X1, mp_impolita, return_sample_GOData=TRUE)
-impolita.gypsyLTR5000_go<-get_enriched_terms(impolita.gypsyLTR5000$X1, mp_impolita, return_sample_GOData=TRUE)
-impolita.harbingerTIR5000_go<-get_enriched_terms(impolita.harbingerTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
-impolita.marinerTIR5000_go<-get_enriched_terms(impolita.marinerTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
-impolita.mutatorTIR5000_go<-get_enriched_terms(impolita.mutatorTIR5000$X1, mp_impolita, return_sample_GOData=TRUE)
+yahouensis.copiaLTR_go<-get_enriched_terms(yahouensis.copiaLTR$X1, mp_yahouensis, return_sample_GOData=TRUE)
+yahouensis.gypsyLTR_go<-get_enriched_terms(yahouensis.gypsyLTR$X1, mp_yahouensis, return_sample_GOData=TRUE)
 
 
-yahouensis.gypsyLTR5000_go$result %>% filter(classicFisher < 0.05)
+impolita.cactaTIR_go<-get_enriched_terms(impolita.cactaTIR$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.copiaLTR_go<-get_enriched_terms(impolita.copiaLTR$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.gypsyLTR_go<-get_enriched_terms(impolita.gypsyLTR$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.harbingerTIR_go<-get_enriched_terms(impolita.harbingerTIR$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.marinerTIR_go<-get_enriched_terms(impolita.marinerTIR$X1, mp_impolita, return_sample_GOData=TRUE)
+impolita.mutatorTIR_go<-get_enriched_terms(impolita.mutatorTIR$X1, mp_impolita, return_sample_GOData=TRUE)
 
-yahouensis.gypsyLTR5000_go$goData
+
+
+
+
+
+
+# yahou-panch sister
+intersect(filter_topGO(yahouensis.gypsyLTR_go)$Term, filter_topGO(pancheri.gypsyLTR_go)$Term)
+
+# yahou-impo same soil (volcanic)
+intersect(filter_topGO(yahouensis.gypsyLTR_go)$Term, filter_topGO(impolita.gypsyLTR_go)$Term)
+
+# impo-revo sister
+intersect(impolita.gypsyLTR_go$result$Term, revolutissima.gypsyLTR_go$result$Term)
+
+# panch-revo same soil (ultramafic)
+intersect(pancheri.gypsyLTR_go$result$Term, revolutissima.gypsyLTR_go$result$Term)
+
+
+# how old are the TEs close to genes here?
+
 
 
 genesInTerm(yahouensis.gypsyLTR5000_go$goData, c("GO:0042127", "GO:0001522"))
-
 get_de_genes_in_term(yahouensis.gypsyLTR5000$X1, "GO:0042127", yahouensis.gypsyLTR5000_go$goData)
-
-# yahou-panch sister
-intersect(filter_topGO(yahouensis.gypsyLTR5000_go)$Term, filter_topGO(pancheri.gypsyLTR5000_go)$Term)
-
-# yahou-impo same soil (volcanic)
-intersect(filter_topGO(yahouensis.gypsyLTR5000_go)$Term, filter_topGO(impolita.gypsyLTR5000_go)$Term)
-
-# impo-revo sister
-intersect(impolita.gypsyLTR5000_go$result$Term, revolutissima.gypsyLTR5000_go$result$Term)
-
-# panch-revo same soil (ultramafic)
-intersect(pancheri.gypsyLTR5000_go$result$Term, revolutissima.gypsyLTR5000_go$result$Term)
-
 
 get_de_genes_in_term(pancheri.gypsyLTR5000$X1, "GO:0015689", pancheri.gypsyLTR5000_go$goData)
 get_de_genes_in_term(revolutissima.gypsyLTR5000$X1, "GO:0015689", revolutissima.gypsyLTR5000_go$goData)
+
+
+
+
+
+
+vieillardii.gene_copiaLTR<-read.table("to_local/vieillardii.gene_copiaLTR") %>% mutate(species="vieillardii", class="copia")
+revolutissima.gene_copiaLTR<-read.table("to_local/revolutissima.gene_copiaLTR") %>% mutate(species="revolutissima", class="copia")
+impolita.gene_gypsyLTR<-read.table("to_local/impolita.gene_gypsyLTR") %>% mutate(species="impolita", class="gypsy")
+pancheri.gene_gypsyLTR<-read.table("to_local/pancheri.gene_gypsyLTR") %>% mutate(species="pancheri", class="gypsy")
+yahouensis.gene_copiaLTR<-read.table("to_local/yahouensis.gene_copiaLTR") %>% mutate(species="yahouensis", class="copia")
+yahouensis.gene_gypsyLTR<-read.table("to_local/yahouensis.gene_gypsyLTR") %>% mutate(species="yahouensis", class="gypsy")
+pancheri.gene_copiaLTR<-read.table("to_local/pancheri.gene_copiaLTR") %>% mutate(species="pancheri", class="copia")
+impolita.gene_copiaLTR<-read.table("to_local/impolita.gene_copiaLTR") %>% mutate(species="impolita", class="copia")
+revolutissima.gene_gypsyLTR<-read.table("to_local/revolutissima.gene_gypsyLTR") %>% mutate(species="revolutissima", class="gypsy")
+vieillardii.gene_gypsyLTR<-read.table("to_local/vieillardii.gene_gypsyLTR") %>% mutate(species="vieillardii", class="gypsy")
+
+
+all_ltr<-rbind(vieillardii.gene_copiaLTR,
+      revolutissima.gene_copiaLTR,
+      impolita.gene_gypsyLTR,
+      pancheri.gene_gypsyLTR,
+      yahouensis.gene_copiaLTR,
+      yahouensis.gene_gypsyLTR,
+      pancheri.gene_copiaLTR,
+      impolita.gene_copiaLTR,
+      revolutissima.gene_gypsyLTR,
+      vieillardii.gene_gypsyLTR)
+
+all_ltr %>% group_by(class) %>% summarise_at("species", sum) 
+
+all_ltr %>% group_by(species, class) %>%
+  summarise(count=n())
+
+all_ltr$species <- factor(all_ltr$species, levels=c("yahouensis", "pancheri", "impolita", "revolutissima", "vieillardii"))
+
+
+all_ltr %>% 
+  ggplot(aes(x = V1, fill = class)) +
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) +
+  facet_wrap(~ species, ncol=2)
+
+
+
 
 
 
