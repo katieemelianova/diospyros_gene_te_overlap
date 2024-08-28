@@ -80,4 +80,4 @@ while read i; do grep $i $annotation_file; done < $species.gene_gypsyLTR_window$
 #             cleanup                  #
 ########################################
 
-rm *window*genes *window*gff3
+#rm *window*genes *window*gff3
