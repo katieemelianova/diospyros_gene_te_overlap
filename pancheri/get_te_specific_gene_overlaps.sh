@@ -12,6 +12,7 @@ window="1000"
 
 #ln -s /lisc/scratch/botany/katie/annotation/braker3/$species/braker/braker.gtf .
 #ln -s /lisc/scratch/botany/katie/annotation/edta_repeatmodeller_output/$species.fasta.mod.EDTA.final/$species.fasta.mod.EDTA.intact.gff3 .
+ln -s  /lisc/scratch/botany/katie/assembled_genomes/assemblies/$species/working/$species.fasta .
 
 
 ###########################################################
@@ -43,6 +44,29 @@ bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.
 bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.mutatorTIR.gff3 > $species.gene_mutatorTIR_window$window.gff3
 bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.copiaLTR.gff3 > $species.gene_copiaLTR_window$window.gff3
 bedtools window -w $window -a braker_gene.gtf -b $species.fasta.mod.EDTA.intact.gypsyLTR.gff3 > $species.gene_gypsyLTR_window$window.gff3
+
+
+#################################################################################################
+#     extract the fasta sequences of genes and TEs that are proximal and put in separate files  #
+#################################################################################################
+
+
+
+cut -f 10,13,14 $species.gene_helitron_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_helitron_window$window.te.fasta
+cut -f 10,13,14 $species.gene_cactaTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_cactaTIR_window$window.te.fasta
+cut -f 10,13,14 $species.gene_harbingerTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_harbingerTIR_window$window.te.fasta
+cut -f 10,13,14 $species.gene_marinerTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_marinerTIR_window$window.te.fasta
+cut -f 10,13,14 $species.gene_mutatorTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_mutatorTIR_window$window.te.fasta
+cut -f 10,13,14 $species.gene_copiaLTR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_copiaLTR_window$window.te.fasta
+cut -f 10,13,14 $species.gene_gypsyLTR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_gypsyLTR_window$window.te.fasta
+
+cut -f 1,4,5 $species.gene_helitron_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_helitron_window$window.gene.fasta
+cut -f 1,4,5 $species.gene_cactaTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_cactaTIR_window$window.gene.fasta
+cut -f 1,4,5 $species.gene_harbingerTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_harbingerTIR_window$window.gene.fasta
+cut -f 1,4,5 $species.gene_marinerTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_marinerTIR_window$window.gene.fasta
+cut -f 1,4,5 $species.gene_mutatorTIR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_mutatorTIR_window$window.gene.fasta
+cut -f 1,4,5 $species.gene_copiaLTR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_copiaLTR_window$window.gene.fasta
+cut -f 1,4,5 $species.gene_gypsyLTR_window$window.gff3 | bedtools getfasta -fi $species.fasta -bed stdin > $species.gene_gypsyLTR_window$window.gene.fasta
 
 
 ###################################################################
