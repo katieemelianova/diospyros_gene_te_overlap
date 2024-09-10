@@ -119,6 +119,96 @@ impolita.helitron<-read_delim("impolita/impolita.gene_helitron_window1000.annota
 impolita.marinerTIR<-read_delim("impolita/impolita.gene_marinerTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="marinerTIR")
 impolita.mutatorTIR<-read_delim("impolita/impolita.gene_mutatorTIR_window1000.annotation", col_names = FALSE) %>% mutate(species="impolita", te_class="mutatorTIR")
 
+species_te_df<-rbind(pancheri.cactaTIR,
+                     pancheri.copiaLTR,
+                     pancheri.gypsyLTR,
+                     pancheri.harbingerTIR,
+                     pancheri.helitron,
+                     pancheri.marinerTIR,
+                     pancheri.mutatorTIR,
+                     revolutissima.cactaTIR,
+                     revolutissima.copiaLTR,
+                     revolutissima.gypsyLTR,
+                     revolutissima.harbingerTIR,
+                     revolutissima.helitron,
+                     revolutissima.marinerTIR,
+                     revolutissima.mutatorTIR,
+                     vieillardii.cactaTIR,
+                     vieillardii.copiaLTR,
+                     vieillardii.gypsyLTR,
+                     vieillardii.harbingerTIR,
+                     vieillardii.helitron,
+                     vieillardii.marinerTIR,
+                     vieillardii.mutatorTIR,
+                     yahouensis.cactaTIR,
+                     yahouensis.copiaLTR,
+                     yahouensis.gypsyLTR,
+                     yahouensis.harbingerTIR,
+                     yahouensis.helitron,
+                     yahouensis.marinerTIR,
+                     yahouensis.mutatorTIR,
+                     impolita.cactaTIR,
+                     impolita.copiaLTR,
+                     impolita.gypsyLTR,
+                     impolita.harbingerTIR,
+                     impolita.helitron,
+                     impolita.marinerTIR,
+                     impolita.mutatorTIR)
+
+
+
+
+
+
+
+# a function which takes a gene ID <> GO terms mapping object per species, filters genes of interest, and counts how many time each GO term occurs
+get_go_counts <- function(mp, data_frame, selection_statement){
+  query_df <- data_frame %>% filter(rlang::eval_tidy(rlang::parse_expr(selection_statement)))
+  mp %>% keep(names(.) %in% query_df$X1) %>% unlist() %>% table() %>% data.frame()
+}
+
+
+
+pancheri_table<-get_go_counts(mp_pancheri, species_te_df, "species == 'pancheri' & te_class == 'gypsyLTR'")
+revolutissima_table<-get_go_counts(mp_revolutissima, species_te_df, "species == 'revolutissima' & te_class == 'gypsyLTR'")
+vieillardii_table<-get_go_counts(mp_vieillardii, species_te_df, "species == 'vieillardii' & te_class == 'gypsyLTR'")
+yahouensis_table<-get_go_counts(mp_yahouensis, species_te_df, "species == 'yahouensis' & te_class == 'gypsyLTR'")
+impolita_table<-get_go_counts(mp_impolita, species_te_df, "species == 'impolita' & te_class == 'gypsyLTR'")
+
+
+test<-purrr::reduce(list(pancheri_table,
+                   revolutissima_table,
+                   vieillardii_table,
+                   yahouensis_table,
+                   impolita_table), dplyr::inner_join, by = ".") %>%
+  set_colnames(c("GO", "pancheri", "revolutissima", "vieillardii", "yahouensis", "impolita"))
+               
+              
+test$stdev<- test %>% dplyr::select(pancheri, revolutissima, vieillardii, yahouensis, impolita) %>% apply(1, sd)
+
+test$stdev %>% hist()
+
+test %>% filter(stdev > 100) %>% dplyr::select(GO)
+
+test %>% filter(stdev > 100) %>% dplyr::select(pancheri, revolutissima, vieillardii, yahouensis, impolita) %>% boxplot()
+
+
+
+
+
+
+mp_impolita[grep("GO:0002215", mp_impolita)] %>% names()
+
+
+mp_impolita[["g13983.t1"]]
+
+mp_impolita
+mp_vieillardii
+mp_pancheri
+mp_revolutissima
+mp_yahouensis
+
+
 ########################################################################
 #       get the go enrichments and objects of closely related genes    #
 ########################################################################
@@ -180,12 +270,53 @@ intersect(impolita.gypsyLTR_go$result$Term, revolutissima.gypsyLTR_go$result$Ter
 intersect(pancheri.gypsyLTR_go$result$Term, revolutissima.gypsyLTR_go$result$Term)
 
 
+
+testing4<-intersect(impolita.gypsyLTR_go$result$GO.ID, revolutissima.gypsyLTR_go$result$GO.ID)
+
+get_de_genes_in_term(impolita.gypsyLTR$X1, "GO:0016192", impolita.gypsyLTR_go$goData) %>% data.frame()
+
+sapply(testing4, function(x) get_de_genes_in_term(impolita.gypsyLTR$X1, x, impolita.gypsyLTR_go$goData) %>% data.frame())
+
+
+
+
+
 # how old are the TEs close to genes here?
 
 
 
-genesInTerm(yahouensis.gypsyLTR5000_go$goData, c("GO:0042127", "GO:0001522"))
-get_de_genes_in_term(yahouensis.gypsyLTR5000$X1, "GO:0042127", yahouensis.gypsyLTR5000_go$goData)
+get_de_genes_in_term(pancheri.gypsyLTR$X1, "GO:0048544", pancheri.gypsyLTR_go$goData) %>% data.frame()
+get_de_genes_in_term(revolutissima.gypsyLTR$X1, "GO:0048544", revolutissima.gypsyLTR_go$goData) %>% data.frame()
+
+genes2test<-get_de_genes_in_term(impolita.gypsyLTR$X1, "GO:0016192", impolita.gypsyLTR_go$goData) %>% data.frame() %>% pull() %>% str_split_i("\\.", 1)
+
+
+testing2<-read.table("impolita_gene_te_dists") %>% set_colnames(c("geneid", "basepairs", "classification", "insertion"))
+
+testing2 %>% filter(colour_by == "yes") %>% pull(basepairs) %>% hist()
+
+
+
+testing2 %>% 
+  #mutate(colour_by=ifelse(geneid %in% genes2test, "yes", "no")) %>% 
+  #filter(classification %in% c("LTR/Copia", "LTR/Gypsy")) %>% 
+  arrange(desc(colour_by)) %>% 
+  filter(abs(basepairs) < 25000 & classification %in% c("LTR/Copia", "LTR/Gypsy")) %>% 
+  drop_na() %>%
+  ggplot(aes(x=basepairs, y=insertion, colour=colour_by, alpha=colour_by)) +
+  geom_point(size=1) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  facet_wrap(~classification) + 
+  scale_colour_manual(values = c("red", "grey89")) +
+  scale_alpha_manual(values=c(1, 0.1))
+
+
+
+ggplot(testing3, aes(x=basepairs, y=insertion)) +
+  geom_point(size=0.5) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 
 get_de_genes_in_term(pancheri.gypsyLTR5000$X1, "GO:0015689", pancheri.gypsyLTR5000_go$goData)
 get_de_genes_in_term(revolutissima.gypsyLTR5000$X1, "GO:0015689", revolutissima.gypsyLTR5000_go$goData)
@@ -218,7 +349,6 @@ all_ltr<-rbind(vieillardii.gene_copiaLTR,
       revolutissima.gene_gypsyLTR,
       vieillardii.gene_gypsyLTR)
 
-all_ltr %>% group_by(class) %>% summarise_at("species", sum) 
 
 all_ltr %>% group_by(species, class) %>%
   summarise(count=n())
@@ -226,12 +356,19 @@ all_ltr %>% group_by(species, class) %>%
 all_ltr$species <- factor(all_ltr$species, levels=c("yahouensis", "pancheri", "impolita", "revolutissima", "vieillardii"))
 
 
+
+pdf("fuckssake.pdf", height=6, width=6)
 all_ltr %>% 
   ggplot(aes(x = V1, fill = class)) +
   geom_density(aes(y = after_stat(count)), alpha = 0.25) +
   facet_wrap(~ species, ncol=2)
+dev.off()
 
-
+rbind(read.table("pancheri.gene_gypsyLTR_window1000_insertiondates") %>% mutate(species="pancheri_1000", class="gypsy"), 
+      read.table("revolutissima.gene_gypsyLTR_window1000_insertiondates") %>% mutate(species="revolutissima_1000", class="gypsy")) %>%
+  ggplot(aes(x = V1, fill = class)) +
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) +
+  facet_wrap(~ species, ncol=2)
 
 
 
