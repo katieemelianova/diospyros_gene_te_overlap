@@ -70,11 +70,546 @@ mp_vieillardii<-readMappings("vieillardii_topGO_annotation.txt")
 mp_pancheri<-readMappings("pancheri_topGO_annotation.txt")
 mp_revolutissima<-readMappings("revolutissima_topGO_annotation.txt")
 mp_yahouensis<-readMappings("yahouensis_topGO_annotation.txt")
+mp_sandwicensis<-readMappings("sandwicensis_topGO_annotation.txt")
+
+
+
+#######################################################################################
+#     for each species, read in GO mappings and gene-TE proximity table               #
+#     inner join them to get the transcript ID (arbitrary but need the tranbscript)   #
+#      get enriched terms of the transcripts which have a TE in them (0 distance)
+########################################################################################
+
+
+sandwicensis_GO<-read_delim("to_r/sandwicensis_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+sandwicensis.gene_te<-read_delim("to_r/sandwicensis.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+
+vieillardii_GO<-read_delim("to_r/vieillardii_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+vieillardii.gene_te<-read_delim("to_r/vieillardii.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+
+impolita_GO<-read_delim("to_r/impolita_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+impolita.gene_te<-read_delim("to_r/impolita.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+
+yahouensis_GO<-read_delim("to_r/yahouensis_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+yahouensis.gene_te<-read_delim("to_r/yahouensis.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+
+revolutissima_GO<-read_delim("to_r/revolutissima_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+revolutissima.gene_te<-read_delim("to_r/revolutissima.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+
+pancheri_GO<-read_delim("to_r/pancheri_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+pancheri.gene_te<-read_delim("to_r/pancheri.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+
+##################################################
+#                read in species tree            #
+################################################## 
+
+species_tree<-ape::read.tree("/Users/katieemelianova/Desktop/Diospyros/diospyros_plots/lib1234_speciestree.editedTiplabs.nwk")
+species_tree.rooted <- root(species_tree, which(species_tree$tip.label == "D.sandwicensis"))
+tip<-c("D.olen", "D.fasciculosa", "D.macrocarpa", "D.ferrea")
+species_tree.rooted<-drop.tip(species_tree.rooted, tip)
+species_tree.rooted$species <- species_tree.rooted$tip.label
+species_tree.rooted$tip.label
+species_tree.rooted$tip.label<-str_replace(species_tree.rooted$tip.label, "D.", "D. ")
+
+
+colours_tips <- case_when(species_tree.rooted$tip.label == "D. sandwicensis" ~ "D. sandwicensis",
+                          species_tree.rooted$tip.label == "D. vieillardii" ~ "D. vieillardii",
+                          species_tree.rooted$tip.label == "D. pancheri" ~ "D. pancheri",
+                          species_tree.rooted$tip.label == "D. revolutissima" ~ "D. revolutissima",
+                          species_tree.rooted$tip.label == "D. impolita" ~ "D. impolita",
+                          species_tree.rooted$tip.label == "D. yahouensis" ~ "D. yahouensis",
+                          species_tree.rooted$tip.label %in% ultramafic ~"Ultramafic",
+                          species_tree.rooted$tip.label %in% volcanic ~"Volcanic",
+                          !(species_tree.rooted$tip.label %in% c("D. sandwicensis", "D. vieillardii", "D. pancheri", "D. revolutissima", "D. impolita", "D. yahouensis")) ~ "No data")
+
+
+dd <- data.frame(taxa=species_tree.rooted$tip.label, tipcols=colours_tips)
+p<-ggtree(species_tree.rooted, size=1)
+p <- p %<+% dd + geom_tippoint(aes(color=tipcols), size=7)
+p2<-p + geom_tiplab(size=8, aes(color=tipcols), offset=0.002, show.legend=FALSE) + 
+  scale_color_manual(values=c("cornflowerblue", "mediumvioletred", "red3", "sienna2", "darkslategray4", "darkblue"), limits = c("D. sandwicensis", "D. vieillardii", "D. pancheri", "D. revolutissima", "D. impolita", "D. yahouensis"), na.value = "grey77") + 
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size=10)) +
+  expand_limits(x = 0.07)
+
+pdf("test.pdf")
+p2
+dev.off()
+
+
+##########################################################
+#.    make hist of gene te distances across species.    #
+##########################################################
+
+pdf("gene_te_distance_histogram.pdf", height=15, width=20)
+rbind(sandwicensis.gene_te %>% dplyr::select(dist) %>% mutate(species="sandwicensis"),
+vieillardii.gene_te %>% dplyr::select(dist) %>% mutate(species="vieillardii"),
+impolita.gene_te %>% dplyr::select(dist) %>% mutate(species="impolita"),
+yahouensis.gene_te %>% dplyr::select(dist) %>% mutate(species="yahouensis"),
+revolutissima.gene_te %>% dplyr::select(dist) %>% mutate(species="revolutissima"),
+pancheri.gene_te %>% dplyr::select(dist) %>% mutate(species="pancheri")) %>%
+  filter(abs(dist) < 10000) %>%
+  ggplot(aes(x=dist)) + 
+  geom_density(aes(y = after_stat(count), colour=species, fill=species), alpha = 0.25) +
+  #geom_histogram() +
+  #geom_density(color = "red", size = 2)
+  facet_wrap(~species) +
+  geom_vline(xintercept=c(0), linetype="dotted", colour="red", size=1) + 
+  scale_color_manual(values=c("cornflowerblue", "limegreen", "orchid3"), limits = c("Outgroup", "Ultramafic", "Volcanic"), na.value = "grey77") + 
+  theme(legend.text = element_text(size=25),
+        legend.title=element_blank(),
+        strip.text = element_text(size = 25, face="italic"),
+        axis.text.x = element_text(size=15),
+        axis.title.x = element_text(size=25),
+        axis.text.y = element_text(size=15),
+        axis.title.y = element_text(size=25))
+dev.off()
+
+
+sample_data<-data.frame(counts=c(sandwicensis.gene_te %>% filter(dist == 0) %>% nrow(), 
+           sandwicensis.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
+           vieillardii.gene_te %>% filter(dist == 0) %>% nrow(),
+           vieillardii.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
+           impolita.gene_te %>% filter(dist == 0) %>% nrow(),
+           impolita.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
+           yahouensis.gene_te %>% filter(dist == 0) %>% nrow(),
+           yahouensis.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
+           revolutissima.gene_te %>% filter(dist == 0) %>% nrow(),
+           revolutissima.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
+           pancheri.gene_te %>% filter(dist == 0) %>% nrow(),
+           pancheri.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow()),
+           category=rep(c("0", "> 0 & < 5000"), 6),
+           species=c("sandwicensis", "sandwicensis",
+                     "vieillardii", "vieillardii",
+                     "impolita", "impolita",
+                     "yahouensis", "yahouensis",
+                     "revolutissima", "revolutissima",
+                     "pancheri", "pancheri")) %>%
+  set_colnames(c("counts", "category", "species"))
+
+
+pdf("test.pdf")
+ggplot(sample_data, aes(category, counts, fill=category)) + 
+  #geom_boxplot()+ 
+  geom_point(aes(colour=species), size=5)+ 
+  geom_line(aes(group=species)) 
+dev.off()
+
+#############################################################
+#.    function to filter genes by their distance to a TE    #
+#############################################################
+
+
+filter_by_dist<-function(species_GO, species.gene_te, selection_statement){
+  to_return<-inner_join(species_GO, species.gene_te, by="gene") %>% 
+    arrange(gene) %>% 
+    filter(rlang::eval_tidy(rlang::parse_expr(selection_statement))) %>% 
+    dplyr::select(-c(gene))
+  return(to_return)
+}
+sand_0<-filter_by_dist(sandwicensis_GO, sandwicensis.gene_te, "dist == 0")
+vie_0<-filter_by_dist(vieillardii_GO, vieillardii.gene_te, "dist == 0")
+panc_0<-filter_by_dist(pancheri_GO, pancheri.gene_te, "dist < 1000")
+rev_0<-filter_by_dist(revolutissima_GO, revolutissima.gene_te, "dist == 0")
+yah_0<-filter_by_dist(yahouensis_GO, yahouensis.gene_te, "dist == 0")
+imp_0<-filter_by_dist(impolita_GO, impolita.gene_te, "dist == 0")
+
+#sand_0_GO<-get_enriched_terms(sand_0$transcript, mp_sandwicensis, return_sample_GOData=TRUE)
+#vie_0_GO<-get_enriched_terms(vie_0$transcript, mp_vieillardii, return_sample_GOData=TRUE)
+#panc_0_GO<-get_enriched_terms(panc_0$transcript, mp_pancheri, return_sample_GOData=TRUE)
+#rev_0_GO<-get_enriched_terms(rev_0$transcript, mp_revolutissima, return_sample_GOData=TRUE)
+#yah_0_GO<-get_enriched_terms(yah_0$transcript, mp_yahouensis, return_sample_GOData=TRUE)
+#imp_0_GO<-get_enriched_terms(imp_0$transcript, mp_impolita, return_sample_GOData=TRUE)
+
+
+
+#sand_0_GO0000373<-get_de_genes_in_term(sand_0$transcript, "GO:0000373", sand_0_GO$goData)
+#vie_0_GO0000373<-get_de_genes_in_term(vie_0$transcript, "GO:0000373", vie_0_GO$goData)
+#panc_0_GO0000373<-get_de_genes_in_term(panc_0$transcript, "GO:0000373", panc_0_GO$goData)
+#rev_0_GO0000373<-get_de_genes_in_term(rev_0$transcript, "GO:0000373", rev_0_GO$goData)
+#yah_0_GO0000373<-get_de_genes_in_term(yah_0$transcript, "GO:0000373", yah_0_GO$goData)
+#imp_0_GO0000373<-get_de_genes_in_term(imp_0$transcript, "GO:0000373", imp_0_GO$goData)
+
+#sand_0 %>% filter(transcript %in% sand_0_GO0000373) %>% dplyr::select(transcript, term, ins) %>% pull(ins) %>% as.numeric() %>% summary()
+#vie_0 %>% filter(transcript %in% vie_0_GO0000373) %>% dplyr::select(transcript, term, ins) %>% pull(ins) %>% as.numeric() %>% summary()
+#panc_0 %>% filter(transcript %in% panc_0_GO0000373) %>% dplyr::select(transcript, term, ins) %>% pull(ins) %>% as.numeric() %>% summary()
+#rev_0 %>% filter(transcript %in% rev_0_GO0000373) %>% dplyr::select(transcript, term, ins) %>% pull(ins) %>% as.numeric() %>% summary()
+#yah_0 %>% filter(transcript %in% yah_0_GO0000373) %>% dplyr::select(transcript, term, ins) %>% pull(ins) %>% as.numeric() %>% summary()
+#imp_0 %>% filter(transcript %in% imp_0_GO0000373) %>% dplyr::select(transcript, term, ins) %>% pull(ins) %>% as.numeric() %>% summary()
+#
+#sand_0_GO0000373<-get_de_genes_in_term(sand_0$transcript, "GO:0000373", sand_0_GO$goData) %>% paste("sandwicensis", ., sep="_")
+#vie_0_GO0000373<-get_de_genes_in_term(vie_0$transcript, "GO:0000373", vie_0_GO$goData) %>% paste("vieillardii", ., sep="_")
+#panc_0_GO0000373<-get_de_genes_in_term(panc_0$transcript, "GO:0000373", panc_0_GO$goData) %>% paste("pancheri", ., sep="_")
+#rev_0_GO0000373<-get_de_genes_in_term(rev_0$transcript, "GO:0000373", rev_0_GO$goData) %>% paste("revolutissima", ., sep="_")
+#yah_0_GO0000373<-get_de_genes_in_term(yah_0$transcript, "GO:0000373", yah_0_GO$goData) %>% paste("yahouensis", ., sep="_")
+#imp_0_GO0000373<-get_de_genes_in_term(imp_0$transcript, "GO:0000373", imp_0_GO$goData) %>% paste("impolita", ., sep="_")
+#
+#write.table(c(sand_0_GO0000373, vie_0_GO0000373, panc_0_GO0000373, 
+#              rev_0_GO0000373, yah_0_GO0000373, imp_0_GO0000373), 
+#            file="testing.txt", 
+#            quote=FALSE, 
+#            row.names = FALSE, 
+#            col.names = FALSE)
+#
+
+###################################################################################################
+#.     get genes with a TE in them and an equal number of rand picked genes without TE in them.   #
+#.     tpo run each on orthofinder and ask if there are more duplicated genes in TE pile.         #
+###################################################################################################
+
+
+# get genes with a TE at least 1KB away
+sand_mt1K<-filter_by_dist(sandwicensis_GO, sandwicensis.gene_te, "dist > 5000")
+vie_mt1K<-filter_by_dist(vieillardii_GO, vieillardii.gene_te, "dist > 5000")
+panc_mt1K<-filter_by_dist(pancheri_GO, pancheri.gene_te, "dist > 5000")
+rev_mt1K<-filter_by_dist(revolutissima_GO, revolutissima.gene_te, "dist > 5000")
+yah_mt1K<-filter_by_dist(yahouensis_GO, yahouensis.gene_te, "dist > 5000")
+imp_mt1K<-filter_by_dist(impolita_GO, impolita.gene_te, "dist > 5000")
+
+# randomly sample the same number of genes >1kb to next TE as those with a TE 0bp away
+sand_mt1K %>% sample_n(sand_0$transcript %>% unique %>% length()) %>% pull(transcript)
+vie_mt1K %>% sample_n(vie_0$transcript %>% unique %>% length()) %>% pull(transcript)
+panc_mt1K %>% sample_n(panc_0$transcript %>% unique %>% length()) %>% pull(transcript)
+rev_mt1K %>% sample_n(rev_0$transcript %>% unique %>% length()) %>% pull(transcript)
+yah_mt1K %>% sample_n(yah_0$transcript %>% unique %>% length()) %>% pull(transcript)
+imp_mt1K %>% sample_n(imp_0$transcript %>% unique %>% length()) %>% pull(transcript)
+
+
+
+
+
+
+orthogroups<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_family_analysis/fastas/OrthoFinder/Results_Sep09/Orthogroups/Orthogroups.tsv") %>% 
+  set_colnames(c("orthogroup", "oleifera", "impolita", "pancheri", "revolutissima", "sandwicensis", "vieillardii", "yahouensis"))
+orthocounts<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_family_analysis/fastas/OrthoFinder/Results_Sep09/Orthogroups/Orthogroups.GeneCount.tsv") %>% 
+  set_colnames(c("orthogroup", "oleifera", "impolita", "pancheri", "revolutissima", "sandwicensis", "vieillardii", "yahouensis", "total"))
+
+
+
+
+sand_0_orthogroups<-sapply(sand_0 %>% pull(transcript) %>% unique(), function(x) orthogroups %>% dplyr::filter(grepl(x, sandwicensis)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+vie_0_orthogroups<-sapply(vie_0 %>% pull(transcript) %>% unique(), function(x) orthogroups %>% dplyr::filter(grepl(x, vieillardii)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+panc_0_orthogroups<-sapply(panc_0 %>% pull(transcript) %>% unique(), function(x) orthogroups %>% dplyr::filter(grepl(x, pancheri)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+rev_0_orthogroups<-sapply(rev_0 %>% pull(transcript) %>% unique(), function(x) orthogroups %>% dplyr::filter(grepl(x, revolutissima)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+yah_0_orthogroups<-sapply(yah_0 %>% pull(transcript) %>% unique(), function(x) orthogroups %>% dplyr::filter(grepl(x, yahouensis)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+imp_0_orthogroups<-sapply(imp_0 %>% pull(transcript) %>% unique(), function(x) orthogroups %>% dplyr::filter(grepl(x, impolita)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+
+sig_cafe<-read.table("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_family_analysis/cafe/results/Base_family_results_significant.txt")
+all_0_orthogroups<-c(sand_0_orthogroups, vie_0_orthogroups, panc_0_orthogroups, rev_0_orthogroups, yah_0_orthogroups, imp_0_orthogroups)
+intersect(sig_cafe$V1, all_0_orthogroups)
+
+sand_mt1K_orthogroups<-sapply(sand_mt1K %>% sample_n(sand_0$transcript %>% unique %>% length()) %>% pull(transcript), function(x) orthogroups %>% dplyr::filter(grepl(x, sandwicensis)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+vie_mt1K_orthogroups<-sapply(vie_mt1K %>% sample_n(vie_0$transcript %>% unique %>% length()) %>% pull(transcript), function(x) orthogroups %>% dplyr::filter(grepl(x, vieillardii)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+panc_mt1K_orthogroups<-sapply(panc_mt1K %>% sample_n(panc_0$transcript %>% unique %>% length()) %>% pull(transcript), function(x) orthogroups %>% dplyr::filter(grepl(x, pancheri)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+rev_mt1K_orthogroups<-sapply(rev_mt1K %>% sample_n(rev_0$transcript %>% unique %>% length()) %>% pull(transcript), function(x) orthogroups %>% dplyr::filter(grepl(x, revolutissima)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+yah_mt1K_orthogroups<-sapply(yah_mt1K %>% sample_n(yah_0$transcript %>% unique %>% length()) %>% pull(transcript), function(x) orthogroups %>% dplyr::filter(grepl(x, yahouensis)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+imp_mt1K_orthogroups<-sapply(imp_mt1K %>% sample_n(imp_0$transcript %>% unique %>% length()) %>% pull(transcript), function(x) orthogroups %>% dplyr::filter(grepl(x, impolita)) %>% pull(orthogroup), simplify = TRUE) %>% unlist() %>% as.vector()
+
+all_mt1K_orthogroups<-c(sand_mt1K_orthogroups, vie_mt1K_orthogroups, panc_mt1K_orthogroups, 
+  rev_mt1K_orthogroups, yah_mt1K_orthogroups, imp_mt1K_orthogroups)
+
+intersect(sig_cafe$V1, all_mt1K_orthogroups)
+
+sig_cafe$V1
+
+intersect(sig_cafe$V1, sand_0_orthogroups) %>% length()
+intersect(sig_cafe$V1, vie_0_orthogroups) %>% length()
+intersect(sig_cafe$V1, panc_0_orthogroups) %>% length()
+intersect(sig_cafe$V1, rev_0_orthogroups) %>% length()
+intersect(sig_cafe$V1, yah_0_orthogroups) %>% length()
+intersect(sig_cafe$V1, imp_0_orthogroups) %>% length()
+
+
+intersect(sig_cafe$V1, sand_mt1K_orthogroups) %>% length()
+intersect(sig_cafe$V1, vie_mt1K_orthogroups) %>% length()
+intersect(sig_cafe$V1, panc_mt1K_orthogroups) %>% length()
+intersect(sig_cafe$V1, rev_mt1K_orthogroups) %>% length()
+intersect(sig_cafe$V1, yah_mt1K_orthogroups) %>% length()
+intersect(sig_cafe$V1, imp_mt1K_orthogroups) %>% length()
+
+
+test<-rbind(data.frame(count=orthocounts %>% filter(orthogroup %in% sand_0_orthogroups) %>% pull(sandwicensis),
+           species="sandwicensis",
+           tedist="0"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% sand_mt1K_orthogroups) %>% pull(sandwicensis),
+                 species="sandwicensis",
+                 tedist="mt1k"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% vie_0_orthogroups) %>% pull(vieillardii),
+                 species="vieillardii",
+                 tedist="0"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% vie_mt1K_orthogroups) %>% pull(vieillardii),
+                 species="vieillardii",
+                 tedist="mt1k"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% panc_0_orthogroups) %>% pull(pancheri),
+                 species="pancheri",
+                 tedist="0"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% panc_mt1K_orthogroups) %>% pull(pancheri),
+                 species="pancheri",
+                 tedist="mt1k"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% rev_0_orthogroups) %>% pull(revolutissima),
+                 species="revolutissima",
+                 tedist="0"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% rev_mt1K_orthogroups) %>% pull(revolutissima),
+                 species="revolutissima",
+                 tedist="mt1k"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% yah_0_orthogroups) %>% pull(yahouensis),
+                 species="yahouensis",
+                 tedist="0"),
+      data.frame(count=orthocounts %>% filter(orthogroup %in% yah_mt1K_orthogroups) %>% pull(yahouensis),
+                 species="yahouensis",
+                 tedist="mt1k"))
+
+test %>%
+  filter(count < 20 & count > 0) %>%
+  ggplot(aes(x=species, y=(count), fill=tedist)) + 
+  #geom_boxplot() +
+  #geom_jitter(color="black", size=0.4, alpha=0.9)
+  geom_violin()
+
+test %>% filter(species == "sandwicensis") %>% group_by(tedist) %>% summarise(count=mean(count))
+test %>% filter(species == "pancheri") %>% group_by(tedist) %>% summarise(count=mean(count))
+test %>% filter(species == "revolutissima") %>% group_by(tedist) %>% summarise(count=mean(count))
+
+
+
+test %>% group_by(species, tedist) %>% summarise(count=median(count))
+
+
+
+
+
+sand_mt1K %>% sample_n(sand_0$transcript %>% unique %>% length()) %>% pull(transcript)
+vie_mt1K %>% sample_n(vie_0$transcript %>% unique %>% length()) %>% pull(transcript)
+panc_mt1K %>% sample_n(panc_0$transcript %>% unique %>% length()) %>% pull(transcript)
+rev_mt1K %>% sample_n(rev_0$transcript %>% unique %>% length()) %>% pull(transcript)
+yah_mt1K %>% sample_n(yah_0$transcript %>% unique %>% length()) %>% pull(transcript)
+imp_mt1K %>% sample_n(imp_0$transcript %>% unique %>% length()) %>% pull(transcript)
+
+
+write.table(sand_mt1K, "sand_mt1K",
+            quote=FALSE, 
+            row.names = FALSE, 
+            col.names = FALSE)
+
+
+write.table(c(sand_0_GO0000373, vie_0_GO0000373, panc_0_GO0000373, 
+              rev_0_GO0000373, yah_0_GO0000373, imp_0_GO0000373), 
+            file="testing.txt", 
+            quote=FALSE, 
+            row.names = FALSE, 
+            col.names = FALSE)
+
+
+
+
+
+
+
+
+
+sand_0_GO$result %>% filter(as.numeric(classicFisher) < 0.005)
+vie_0_GO$result %>% filter(as.numeric(classicFisher) < 0.005)
+panc_0_GO$result %>% filter(as.numeric(classicFisher) < 0.005)
+rev_0_GO$result %>% filter(as.numeric(classicFisher) < 0.005)
+yah_0_GO$result %>% filter(as.numeric(classicFisher) < 0.005)
+imp_0_GO$result %>% filter(as.numeric(classicFisher) < 0.005)
+
+
+test_all<-rbind(sand_0$result %>% filter(as.numeric(classicFisher) < 0.5) %>% dplyr::select(GO.ID, Term, Significant) %>% mutate(species = "sandwicensis"),
+            vie_0$result %>% filter(as.numeric(classicFisher) < 0.5) %>% dplyr::select(GO.ID, Term, Significant) %>% mutate(species = "viellardii"),
+            imp_0$result %>% filter(as.numeric(classicFisher) < 0.5) %>% dplyr::select(GO.ID, Term, Significant) %>% mutate(species = "impolita"),
+            rev_0$result %>% filter(as.numeric(classicFisher) < 0.5) %>% dplyr::select(GO.ID, Term, Significant) %>% mutate(species = "revolutissima"),
+            yah_0$result %>% filter(as.numeric(classicFisher) < 0.5) %>% dplyr::select(GO.ID, Term, Significant) %>% mutate(species = "yahouensis"),
+            panc_0$result %>% filter(as.numeric(classicFisher) < 0.5) %>% dplyr::select(GO.ID, Term, Significant) %>% mutate(species = "pancheri"))
+
+
+############################################################################################################
+#         get table of GO term and number of genes with a TE in them annotated to that term per species.   #
+#############################################################################################################
+
+gene_te_0_table<-rbind(sand_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "sandwicensis"),
+vie_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "viellardii"),
+imp_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "impolita"),
+rev_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "revolutissima"),
+yah_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "yahouensis"),
+panc_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "pancheri")) %>% 
+  reshape(idvar = "Term", timevar = "species", direction = "wide") %>% 
+  replace_na(list(Significant.sandwicensis = 0,
+                  Significant.viellardii = 0, 
+                  Significant.impolita = 0, 
+                  Significant.revolutissima = 0, 
+                  Significant.yahouensis = 0, 
+                  Significant.pancheri = 0))
+
+gene_te_0_table_nonsig<-rbind(sand_0$result %>% filter(as.numeric(classicFisher) < 0.05) %>% dplyr::select(Term, Significant) %>% mutate(species = "sandwicensis"),
+                       vie_0$result %>% filter(as.numeric(classicFisher) > 0.1) %>% dplyr::select(Term, Significant) %>% mutate(species = "viellardii"),
+                       imp_0$result %>% filter(as.numeric(classicFisher) > 0.1) %>% dplyr::select(Term, Significant) %>% mutate(species = "impolita"),
+                       rev_0$result %>% filter(as.numeric(classicFisher) > 0.1) %>% dplyr::select(Term, Significant) %>% mutate(species = "revolutissima"),
+                       yah_0$result %>% filter(as.numeric(classicFisher) > 0.1) %>% dplyr::select(Term, Significant) %>% mutate(species = "yahouensis"),
+                       panc_0$result %>% filter(as.numeric(classicFisher) > 0.1) %>% dplyr::select(Term, Significant) %>% mutate(species = "pancheri")) %>% 
+  reshape(idvar = "Term", timevar = "species", direction = "wide") %>% 
+  replace_na(list(Significant.sandwicensis = 0,
+                  Significant.viellardii = 0, 
+                  Significant.impolita = 0, 
+                  Significant.revolutissima = 0, 
+                  Significant.yahouensis = 0, 
+                  Significant.pancheri = 0))
+
+
+# get terms with at least N genes annotated to them per species
+gene_te_0_table[rowSums(gene_te_0_table>1) >=5,] %>% rownames_to_column(var="remove") %>% dplyr::select(-"remove") %>% column_to_rownames(var="Term") %>% pheatmap::pheatmap(cluster_rows=F, cluster_cols=F) 
+ 
+##########################################################################
+#.  HEATMAP minimum 10 distance between ultramafic and volcnic species.  #
+##########################################################################
+
+gene_te_0_table %>% rownames_to_column(var="remove") %>% 
+  dplyr::select(-"remove") %>% 
+  column_to_rownames(var="Term") %>% 
+  set_colnames(c("sandwicensis", "viellardii", "impolita", "revolutissima", "yahouensis", "pancheri")) %>%
+  filter(revolutissima - impolita > 10 & 
+         pancheri - yahouensis > 10) %>% 
+  pheatmap::pheatmap(cluster_rows=F, cluster_cols=F, fontsize=20, angle_col=315)
+
+
+#############################################################
+#.  HEATMAP mean normalised hatmap mean normalised by row.  #
+#############################################################
+
+test$row_mean<-rowMeans(test)
+test %>% mutate(Significant.sandwicensis=Significant.sandwicensis/row_mean,
+                Significant.viellardii =Significant.viellardii /row_mean,
+                Significant.impolita=Significant.impolita/row_mean,
+                Significant.revolutissima=Significant.revolutissima/row_mean,
+                Significant.yahouensis=Significant.yahouensis/row_mean,
+                Significant.pancheri=Significant.pancheri/row_mean) %>%
+  dplyr::select(-"row_mean") %>%
+  set_colnames(c("sandwicensis", "viellardii", "impolita", "revolutissima", "yahouensis", "pancheri")) %>%
+  pheatmap::pheatmap(cluster_rows=F, cluster_cols=F)
+
+
+
+#############################################
+#.  get genes in term for DNA metabolism .  #
+#############################################
+
+
+dna_met_revo<-get_de_genes_in_term(inner_join(revolutissima_GO, revolutissima.gene_te, by="gene") %>% 
+                                     arrange(gene) %>% dplyr::select(-none) %>% 
+                                     filter(abs(dist) == 0 & proc == "biological_process") %>%
+                                     pull(transcript), "GO:0006259", rev_0$goData)
+
+dna_met_impo<-get_de_genes_in_term(inner_join(impolita_GO, impolita.gene_te, by="gene") %>% 
+                                     arrange(gene) %>% dplyr::select(-none) %>% 
+                                     filter(abs(dist) == 0 & proc == "biological_process") %>%
+                                     pull(transcript), "GO:0006259", imp_0$goData)
+
+dna_met_panc<-get_de_genes_in_term(inner_join(pancheri_GO, pancheri.gene_te, by="gene") %>% 
+                                     arrange(gene) %>% dplyr::select(-none) %>% 
+                                     filter(abs(dist) == 0 & proc == "biological_process") %>%
+                                     pull(transcript), "GO:0006259", panc_0$goData)
+
+dna_met_yaho<-get_de_genes_in_term(inner_join(yahouensis_GO, yahouensis.gene_te, by="gene") %>% 
+                                     arrange(gene) %>% dplyr::select(-none) %>% 
+                                     filter(abs(dist) == 0 & proc == "biological_process") %>%
+                                     pull(transcript), "GO:0006259", yah_0$goData)
+
+dna_met_vie<-get_de_genes_in_term(inner_join(vieillardii_GO, vieillardii.gene_te, by="gene") %>% 
+                                     arrange(gene) %>% dplyr::select(-none) %>% 
+                                     filter(abs(dist) == 0 & proc == "biological_process") %>%
+                                     pull(transcript), 
+                                  "GO:0006259", 
+                                  vie_0$goData)
+
+
+
+inner_join(impolita_GO, impolita.gene_te, by="gene") %>% filter(transcript %in% dna_met_impo & proc == "biological_process") %>% data.frame()
+inner_join(revolutissima_GO, revolutissima.gene_te, by="gene") %>% filter(transcript %in% dna_met_revo& proc == "biological_process") %>% data.frame()
+inner_join(yahouensis_GO, yahouensis.gene_te, by="gene") %>% filter(transcript %in% dna_met_yaho& proc == "biological_process") %>% data.frame()
+inner_join(pancheri_GO, pancheri.gene_te, by="gene") %>% filter(transcript %in% dna_met_panc& proc == "biological_process") %>% data.frame()
+
+toplot<-rbind(inner_join(impolita_GO, impolita.gene_te, by="gene") %>% filter(transcript %in% dna_met_impo & proc == "biological_process") %>% dplyr::select(ins) %>% mutate(species="impolita"),
+inner_join(revolutissima_GO, revolutissima.gene_te, by="gene") %>% filter(transcript %in% dna_met_revo& proc == "biological_process") %>% dplyr::select(ins) %>% mutate(species="revolutissima"),
+inner_join(yahouensis_GO, yahouensis.gene_te, by="gene") %>% filter(transcript %in% dna_met_yaho& proc == "biological_process") %>% dplyr::select(ins) %>% mutate(species="yahounensis"),
+inner_join(pancheri_GO, pancheri.gene_te, by="gene") %>% filter(transcript %in% dna_met_panc& proc == "biological_process") %>% dplyr::select(ins) %>% mutate(species="pancheri"))
+
+toplot %>% ggplot(aes(x=as.numeric(ins), fill=species)) + geom_histogram() + facet_wrap(~species)
+
+toplot$species <-factor(toplot$species, levels=c("yahounensis", "pancheri", "impolita", "revolutissima"))
+
+png("te_gene_enrichment_date", width=800, height=600)
+toplot %>% 
+  ggplot(aes(x=as.numeric(ins), fill=species)) + 
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) + 
+  facet_wrap(~species) +
+  theme(legend.text = element_text(size=22),
+        legend.position = "none",
+        strip.text = element_text(size = 20, face="italic"),
+        axis.text.x = element_text(size=13),
+        axis.title.x = element_text(size=20),
+        axis.text.y = element_text(size=13),
+        axis.title.y = element_text(size=20)) +
+  ylab("Number of LTR Retrotrannsposons") +
+  xlab("How recently inserted into the genome") +
+  scale_fill_manual(values=c("orchid3", "limegreen", "orchid3", "limegreen", "limegreen", "cornflowerblue"))
+dev.off()
+
+
+
+
+
+
+
+read_delim("to_r/pancheri_GO_database_result.txt")
+read_delim("to_r/pancheri.gene_te_dists_annotation")
+
+
+ann<-read_delim("to_r/GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+dis<-read_delim("to_r/revolutissima.gene_te_dists", col_names = c("gene", "dist", "te", "ins", "none"))
+
+inner_join(ann, dis, by="gene") %>% 
+  arrange(gene) %>% dplyr::select(-none) %>% 
+  filter(abs(dist) > 10000 & proc == "biological_process") %>%
+  group_by(term) %>%
+  summarise(count=n()) %>%
+  arrange(desc(count))
+
+revtest<-inner_join(ann, dis, by="gene") %>% 
+  arrange(gene) %>% dplyr::select(-none) %>% 
+  filter(abs(dist) < 500 & proc == "biological_process") %>%
+  pull(transcript) %>%
+  get_enriched_terms(., mp_revolutissima, return_sample_GOData=TRUE)
+
+revtest_0<-inner_join(ann, dis, by="gene") %>% 
+  arrange(gene) %>% dplyr::select(-none) %>% 
+  filter(abs(dist) == 0 & proc == "biological_process") %>%
+  pull(transcript) %>%
+  get_enriched_terms(., mp_revolutissima, return_sample_GOData=TRUE)
+
+revtest_mt10k<-inner_join(ann, dis, by="gene") %>% 
+  arrange(gene) %>% dplyr::select(-none) %>% 
+  filter(abs(dist) > 10000 & proc == "biological_process") %>%
+  pull(transcript) %>%
+  get_enriched_terms(., mp_revolutissima, return_sample_GOData=TRUE)
+
+
+
+
+
+
+inner_join(ann, dis, by="gene") %>% 
+  arrange(gene) %>% dplyr::select(-none) %>% 
+  filter(abs(dist) == 0 & proc == "biological_process" & go %in% c("GO:0000373")) %>%
+  pull(transcript)
+
+rt_0_go<-revtest_0$result %>% filter(as.numeric(classicFisher) < 0.00005) %>% pull(GO.ID)
+revtest_0$result %>% filter(as.numeric(classicFisher) < 0.0005)
+revtest_mt10k$result %>% filter(as.numeric(classicFisher) < 0.0005)
 
 
 
 #############################################################
-#    read in annotation of genes within 5KB of a TE         #
+#    read in annotation of genes within 1KB of a TE         #
 #############################################################
 
 
@@ -182,11 +717,24 @@ test<-purrr::reduce(list(pancheri_table,
                    yahouensis_table,
                    impolita_table), dplyr::inner_join, by = ".") %>%
   set_colnames(c("GO", "pancheri", "revolutissima", "vieillardii", "yahouensis", "impolita"))
-               
-              
-test$stdev<- test %>% dplyr::select(pancheri, revolutissima, vieillardii, yahouensis, impolita) %>% apply(1, sd)
+     
 
-test$stdev %>% hist()
+
+test_mean_centred<- test %>% mutate(pancheri=pancheri/sum(pancheri, revolutissima, vieillardii, yahouensis, impolita)/5,
+                                    revolutissima=revolutissima/sum(pancheri, revolutissima, vieillardii, yahouensis, impolita)/5,
+                                    vieillardii=vieillardii/sum(pancheri, revolutissima, vieillardii, yahouensis, impolita)/5,
+                                    yahouensis=yahouensis/sum(pancheri, revolutissima, vieillardii, yahouensis, impolita)/5,
+                                    impolita=impolita/sum(pancheri, revolutissima, vieillardii, yahouensis, impolita)/5)
+
+gf<-test_mean_centred %>% filter(stdev > 0.002) %>% pull(GO)
+
+test %>% filter(GO %in% gf)
+
+test_mean_centred$stdev<- test_mean_centred %>% dplyr::select(pancheri, revolutissima, vieillardii, yahouensis, impolita) %>% apply(1, sd)
+
+
+
+test_mean_centred$stdev %>% hist()
 
 test %>% filter(stdev > 100) %>% dplyr::select(GO)
 
@@ -271,49 +819,76 @@ intersect(pancheri.gypsyLTR_go$result$Term, revolutissima.gypsyLTR_go$result$Ter
 
 
 
-testing4<-intersect(impolita.gypsyLTR_go$result$GO.ID, revolutissima.gypsyLTR_go$result$GO.ID)
-
-get_de_genes_in_term(impolita.gypsyLTR$X1, "GO:0016192", impolita.gypsyLTR_go$goData) %>% data.frame()
-
-sapply(testing4, function(x) get_de_genes_in_term(impolita.gypsyLTR$X1, x, impolita.gypsyLTR_go$goData) %>% data.frame())
+intersect(impolita.gypsyLTR_go$result$GO.ID, revolutissima.gypsyLTR_go$result$GO.ID)
+#setdiff(impolita.gypsyLTR_go$result$GO.ID, revolutissima.gypsyLTR_go$result$GO.ID)
 
 
+#sapply(testing4, function(x) get_de_genes_in_term(impolita.gypsyLTR$X1, x, impolita.gypsyLTR_go$goData) %>% data.frame())
 
 
 
-# how old are the TEs close to genes here?
+#genes2test<-get_de_genes_in_term(impolita.gypsyLTR$X1, "GO:0016192", impolita.gypsyLTR_go$goData) %>% data.frame() %>% pull() %>% str_split_i("\\.", 1)
+genes2test_impolita<-get_de_genes_in_term(impolita.gypsyLTR$X1, "GO:0016192", impolita.gypsyLTR_go$goData) %>% data.frame() %>% pull() %>% str_split_i("\\.", 1)
+genes2test_revolutissima<-get_de_genes_in_term(revolutissima.gypsyLTR$X1, "GO:0016192", revolutissima.gypsyLTR_go$goData) %>% data.frame() %>% pull() %>% str_split_i("\\.", 1)
 
 
-
-get_de_genes_in_term(pancheri.gypsyLTR$X1, "GO:0048544", pancheri.gypsyLTR_go$goData) %>% data.frame()
-get_de_genes_in_term(revolutissima.gypsyLTR$X1, "GO:0048544", revolutissima.gypsyLTR_go$goData) %>% data.frame()
-
-genes2test<-get_de_genes_in_term(impolita.gypsyLTR$X1, "GO:0016192", impolita.gypsyLTR_go$goData) %>% data.frame() %>% pull() %>% str_split_i("\\.", 1)
+impolita.gene_te_dists<-read.table("impolita.gene_te_dists") %>% set_colnames(c("geneid", "basepairs", "classification", "insertion"))
+revolutissima.gene_te_dists<-read.table("revolutissima.gene_te_dists") %>% set_colnames(c("geneid", "basepairs", "classification", "insertion"))
 
 
-testing2<-read.table("impolita_gene_te_dists") %>% set_colnames(c("geneid", "basepairs", "classification", "insertion"))
+impolita.gene_te_dists %>% filter(abs(basepairs) == 0 & classification %in% c("LTR/Copia") & geneid %in% genes2test_impolita) %>% pull(geneid)
+revolutissima.gene_te_dists %>% filter(abs(basepairs) == 0 & classification %in% c("LTR/Copia") & geneid %in% genes2test_revolutissima) %>% pull(geneid)
 
-testing2 %>% filter(colour_by == "yes") %>% pull(basepairs) %>% hist()
+genes2test_impolita<-"g1123"
+genes2test_revolutissima <-"g4"
 
+#impolita.gene_te_dists %>% filter(geneid == "g1123")
+#revolutissima.gene_te_dists %>% filter(geneid == "g4")  
 
-
-testing2 %>% 
-  #mutate(colour_by=ifelse(geneid %in% genes2test, "yes", "no")) %>% 
-  #filter(classification %in% c("LTR/Copia", "LTR/Gypsy")) %>% 
-  arrange(desc(colour_by)) %>% 
-  filter(abs(basepairs) < 25000 & classification %in% c("LTR/Copia", "LTR/Gypsy")) %>% 
+pdf("impolita_dists.pdf", height=6, width=4)
+impolita.gene_te_dists %>% 
+  mutate(colour_by=ifelse(geneid %in% genes2test_impolita, "yes", "no")) %>% 
+  filter(classification %in% c("LTR/Copia", "LTR/Gypsy", "LTR/unknown")) %>% 
+  arrange((colour_by)) %>% 
+  #filter(abs(basepairs) < 10000 & classification %in% c("LTR/Copia", "LTR/Gypsy")) %>% 
   drop_na() %>%
-  ggplot(aes(x=basepairs, y=insertion, colour=colour_by, alpha=colour_by)) +
+  ggplot(aes(x=basepairs, y=insertion, colour=colour_by)) +
   geom_point(size=1) +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank()) +
   facet_wrap(~classification) + 
-  scale_colour_manual(values = c("red", "grey89")) +
-  scale_alpha_manual(values=c(1, 0.1))
+  scale_colour_manual(values = c("grey89", "red"))
+dev.off()
 
 
 
-ggplot(testing3, aes(x=basepairs, y=insertion)) +
+pdf("revolutissima_dists.pdf", height=6, width=4)
+revolutissima.gene_te_dists %>% 
+  mutate(colour_by=ifelse(geneid %in% genes2test_revolutissima, "yes", "no")) %>% 
+  filter(classification %in% c("LTR/Copia", "LTR/Gypsy", "LTR/unknown")) %>% 
+  arrange((colour_by)) %>% 
+  #filter(abs(basepairs) < 10000 & classification %in% c("LTR/Copia", "LTR/Gypsy")) %>% 
+  drop_na() %>%
+  ggplot(aes(x=basepairs, y=insertion, colour=colour_by)) +
+  geom_point(size=1) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  facet_wrap(~classification) + 
+  scale_colour_manual(values = c("grey89", "red"))
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+ ggplot(testing3, aes(x=basepairs, y=insertion)) +
   geom_point(size=0.5) +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank())
