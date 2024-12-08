@@ -3,7 +3,10 @@ library(dplyr)
 library(magrittr)
 library(readr)
 library(stringr)
-
+library(ape)
+library(ggtree)
+library(ggplot2)
+library(egg)
 
 ############################################
 #        function for topGO enrichment     #
@@ -73,6 +76,14 @@ mp_yahouensis<-readMappings("yahouensis_topGO_annotation.txt")
 mp_sandwicensis<-readMappings("sandwicensis_topGO_annotation.txt")
 
 
+names(mp_impolita) %<>% str_split_i(".t1", 1)
+names(mp_vieillardii) %<>% str_split_i(".t1", 1)
+names(mp_pancheri) %<>% str_split_i(".t1", 1)
+names(mp_revolutissima) %<>% str_split_i(".t1", 1)
+names(mp_yahouensis) %<>% str_split_i(".t1", 1)
+names(mp_sandwicensis) %<>% str_split_i(".t1", 1)
+
+
 
 #######################################################################################
 #     for each species, read in GO mappings and gene-TE proximity table               #
@@ -81,23 +92,80 @@ mp_sandwicensis<-readMappings("sandwicensis_topGO_annotation.txt")
 ########################################################################################
 
 
-sandwicensis_GO<-read_delim("to_r/sandwicensis_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
-sandwicensis.gene_te<-read_delim("to_r/sandwicensis.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+  
 
-vieillardii_GO<-read_delim("to_r/vieillardii_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
-vieillardii.gene_te<-read_delim("to_r/vieillardii.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
 
-impolita_GO<-read_delim("to_r/impolita_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
-impolita.gene_te<-read_delim("to_r/impolita.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
 
-yahouensis_GO<-read_delim("to_r/yahouensis_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
-yahouensis.gene_te<-read_delim("to_r/yahouensis.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+#sandwicensis_GO<-read_delim("to_r/sandwicensis_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+#sandwicensis.gene_te<-read_delim("to_r/sandwicensis.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+sandwicensis.gene_te<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_te_overlap/gene_te_overlaps/sandwicensis.gene_te_dists", col_names = c("annotation", "gene", "gene_dist", "te_length", "insertion_date"))
 
-revolutissima_GO<-read_delim("to_r/revolutissima_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
-revolutissima.gene_te<-read_delim("to_r/revolutissima.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+#vieillardii_GO<-read_delim("to_r/vieillardii_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+#vieillardii.gene_te<-read_delim("to_r/vieillardii.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+vieillardii.gene_te<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_te_overlap/gene_te_overlaps/vieillardii.gene_te_dists", col_names = c("annotation", "gene", "gene_dist", "te_length", "insertion_date"))
 
-pancheri_GO<-read_delim("to_r/pancheri_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
-pancheri.gene_te<-read_delim("to_r/pancheri.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+#impolita_GO<-read_delim("to_r/impolita_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+#impolita.gene_te<-read_delim("to_r/impolita.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+impolita.gene_te<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_te_overlap/gene_te_overlaps/impolita.gene_te_dists", col_names = c("annotation", "gene", "gene_dist", "te_length", "insertion_date"))
+
+#yahouensis_GO<-read_delim("to_r/yahouensis_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+#yahouensis.gene_te<-read_delim("to_r/yahouensis.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+yahouensis.gene_te<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_te_overlap/gene_te_overlaps/yahouensis.gene_te_dists", col_names = c("annotation", "delete", "gene", "gene_dist", "te_length", "insertion_date")) %>% dplyr::select(-delete)
+
+#revolutissima_GO<-read_delim("to_r/revolutissima_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+#revolutissima.gene_te<-read_delim("to_r/revolutissima.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+revolutissima.gene_te<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_te_overlap/gene_te_overlaps/revolutissima.gene_te_dists", col_names = c("annotation", "gene", "gene_dist", "te_length", "insertion_date"))
+
+#pancheri_GO<-read_delim("to_r/pancheri_GO_database_result.txt", col_names = c("transcript", "go", "term", "proc")) %>% mutate(gene=str_split_i(transcript, "\\.", 1))
+#pancheri.gene_te<-read_delim("to_r/pancheri.gene_te_dists_annotation", col_names = c("gene", "dist", "te", "ins", "none"))
+pancheri.gene_te<-read_delim("/Users/katieemelianova/Desktop/Diospyros/diospyros_gene_te_overlap/gene_te_overlaps/pancheri.gene_te_dists", col_names = c("annotation", "gene", "gene_dist", "te_length", "insertion_date"))
+
+all.gene_te<-rbind(sandwicensis.gene_te %>% mutate(species="D. sandwicensis"),
+                   vieillardii.gene_te %>% mutate(species="D. vieillardii"),
+                   impolita.gene_te %>% mutate(species="D. impolita"),
+                   yahouensis.gene_te %>% mutate(species="D. yahouensis"),
+                   revolutissima.gene_te %>% mutate(species="D. revolutissima"),
+                   pancheri.gene_te %>% mutate(species="D. pancheri"))
+
+
+pdf("test3.pdf", height=13, width=16)
+all.gene_te %>% filter(annotation %in% c("LTR/Gypsy", "LTR/Copia")) %>% 
+  ggplot(aes(x=te_length, fill=annotation)) + 
+  geom_density(aes(y = after_stat(count)), alpha = 0.25)  + 
+  facet_wrap(~species) +
+  geom_vline(xintercept=c(5300), linetype="dotted", colour="red", size=1) +
+  geom_vline(xintercept=c(8500), linetype="dotted", colour="red", size=1) +
+  geom_vline(xintercept=c(11550), linetype="dotted", colour="red", size=1) 
+dev.off()
+
+
+all.gene_te %>% filter(te_length > 8000 & te_length < 8700) %>%
+  filter(abs(as.numeric(gene_dist)) < 10000 & annotation == "LTR/Gypsy") %>%
+  ggplot(aes(x=gene_dist, fill=species)) + 
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) + facet_wrap(~species)
+  
+
+all.gene_te %>% filter(te_length > 11300 & te_length < 11700) %>%
+  mutate(insertion_date=as.numeric(insertion_date)) %>%
+  filter(annotation == "LTR/Gypsy") %>%
+  ggplot(aes(x=insertion_date, fill=species)) + 
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) + facet_wrap(~species) +
+  geom_vline(xintercept=c(0.973), linetype="dotted", colour="red", size=1) 
+
+
+all.gene_te %>% filter(te_length > 8000 & te_length < 8700) %>%
+  mutate(insertion_date=as.numeric(insertion_date)) %>%
+  filter(annotation == "LTR/Gypsy") %>%
+  ggplot(aes(x=insertion_date, fill=species)) + 
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) + facet_wrap(~species) +
+  geom_vline(xintercept=c(0.96), linetype="dotted", colour="red", size=1) 
+
+
+
+
+
+all.gene_te %>% ggplot(aes(x=te_length, fill=species)) + geom_histogram() + facet_wrap(~species)
+
 
 ##################################################
 #                read in species tree            #
@@ -108,7 +176,6 @@ species_tree.rooted <- root(species_tree, which(species_tree$tip.label == "D.san
 tip<-c("D.olen", "D.fasciculosa", "D.macrocarpa", "D.ferrea")
 species_tree.rooted<-drop.tip(species_tree.rooted, tip)
 species_tree.rooted$species <- species_tree.rooted$tip.label
-species_tree.rooted$tip.label
 species_tree.rooted$tip.label<-str_replace(species_tree.rooted$tip.label, "D.", "D. ")
 
 
@@ -118,109 +185,180 @@ colours_tips <- case_when(species_tree.rooted$tip.label == "D. sandwicensis" ~ "
                           species_tree.rooted$tip.label == "D. revolutissima" ~ "D. revolutissima",
                           species_tree.rooted$tip.label == "D. impolita" ~ "D. impolita",
                           species_tree.rooted$tip.label == "D. yahouensis" ~ "D. yahouensis",
-                          species_tree.rooted$tip.label %in% ultramafic ~"Ultramafic",
-                          species_tree.rooted$tip.label %in% volcanic ~"Volcanic",
                           !(species_tree.rooted$tip.label %in% c("D. sandwicensis", "D. vieillardii", "D. pancheri", "D. revolutissima", "D. impolita", "D. yahouensis")) ~ "No data")
+
 
 
 dd <- data.frame(taxa=species_tree.rooted$tip.label, tipcols=colours_tips)
 p<-ggtree(species_tree.rooted, size=1)
-p <- p %<+% dd + geom_tippoint(aes(color=tipcols), size=7)
-p2<-p + geom_tiplab(size=8, aes(color=tipcols), offset=0.002, show.legend=FALSE) + 
-  scale_color_manual(values=c("cornflowerblue", "mediumvioletred", "red3", "sienna2", "darkslategray4", "darkblue"), limits = c("D. sandwicensis", "D. vieillardii", "D. pancheri", "D. revolutissima", "D. impolita", "D. yahouensis"), na.value = "grey77") + 
+p <- p %<+% dd + geom_tippoint(aes(color=tipcols), size=10)
+p2<-p + geom_tiplab(size=11, aes(color=tipcols), offset=0.002, show.legend=FALSE) + 
+  scale_color_manual(values=c("goldenrod", "darkblue", "cornflowerblue", "darkolivegreen4", "#B25D91FF", "brown3"), limits = c("D. sandwicensis", "D. vieillardii", "D. pancheri", "D. revolutissima", "D. impolita", "D. yahouensis"), na.value = "grey77") + 
   theme(legend.title = element_blank(),
-        legend.text = element_text(size=10)) +
+        legend.text = element_text(size=10),
+        legend.position = "none") +
   expand_limits(x = 0.07)
 
-pdf("test.pdf")
-p2
-dev.off()
 
 
-##########################################################
-#.    make hist of gene te distances across species.    #
-##########################################################
 
-pdf("gene_te_distance_histogram.pdf", height=15, width=20)
-rbind(sandwicensis.gene_te %>% dplyr::select(dist) %>% mutate(species="sandwicensis"),
-vieillardii.gene_te %>% dplyr::select(dist) %>% mutate(species="vieillardii"),
-impolita.gene_te %>% dplyr::select(dist) %>% mutate(species="impolita"),
-yahouensis.gene_te %>% dplyr::select(dist) %>% mutate(species="yahouensis"),
-revolutissima.gene_te %>% dplyr::select(dist) %>% mutate(species="revolutissima"),
-pancheri.gene_te %>% dplyr::select(dist) %>% mutate(species="pancheri")) %>%
-  filter(abs(dist) < 10000) %>%
-  ggplot(aes(x=dist)) + 
-  geom_density(aes(y = after_stat(count), colour=species, fill=species), alpha = 0.25) +
-  #geom_histogram() +
-  #geom_density(color = "red", size = 2)
-  facet_wrap(~species) +
+
+
+#########################################################################
+#.    make hist of gene te distances across species with phylo tree.    #
+#########################################################################
+
+ho<-rbind(sandwicensis.gene_te %>% dplyr::select(gene_dist) %>% mutate(species="D. sandwicensis"),
+vieillardii.gene_te %>% dplyr::select(gene_dist) %>% mutate(species="D. vieillardii"),
+impolita.gene_te %>% dplyr::select(gene_dist) %>% mutate(species="D. impolita"),
+yahouensis.gene_te %>% dplyr::select(gene_dist) %>% mutate(species="D. yahouensis"),
+revolutissima.gene_te %>% dplyr::select(gene_dist) %>% mutate(species="D. revolutissima"),
+pancheri.gene_te %>% dplyr::select(gene_dist) %>% mutate(species="D. pancheri"))
+ho$species <- factor(ho$species, levels=c("D. yahouensis", "D. pancheri",
+                                            "D. impolita", "D. revolutissima",
+                                            "D. vieillardii", "D. sandwicensis"))
+ho <- ho %>%
+  filter(abs(as.numeric(gene_dist)) < 10000) %>%
+  ggplot(aes(x=gene_dist, fill=species)) + 
+  geom_density(aes(y = after_stat(count)), alpha = 0.25) +
+  facet_wrap(~species, ncol=2) +
   geom_vline(xintercept=c(0), linetype="dotted", colour="red", size=1) + 
-  scale_color_manual(values=c("cornflowerblue", "limegreen", "orchid3"), limits = c("Outgroup", "Ultramafic", "Volcanic"), na.value = "grey77") + 
+  scale_fill_manual(values=c("goldenrod", "darkblue", "cornflowerblue", "darkolivegreen4", "#B25D91FF", "brown3"), limits = c("D. sandwicensis", "D. vieillardii", "D. pancheri", "D. revolutissima", "D. impolita", "D. yahouensis")) + 
   theme(legend.text = element_text(size=25),
-        legend.title=element_blank(),
+        legend.position="none",
         strip.text = element_text(size = 25, face="italic"),
         axis.text.x = element_text(size=15),
         axis.title.x = element_text(size=25),
         axis.text.y = element_text(size=15),
-        axis.title.y = element_text(size=25))
+        axis.title.y = element_text(size=25)) +
+  xlab("Distance from gene (bp") +
+  ylab("Number of LTR Retrotransposons")
+
+
+pdf("test.pdf", width=20, height=15)
+grid.arrange(p2, ho, ncol=2)
 dev.off()
 
+#######################################################################################
+#.    plot paired scatter for TEs 0 distance and TEs > 0 distance for all species.    #
+#######################################################################################
 
-sample_data<-data.frame(counts=c(sandwicensis.gene_te %>% filter(dist == 0) %>% nrow(), 
-           sandwicensis.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
-           vieillardii.gene_te %>% filter(dist == 0) %>% nrow(),
-           vieillardii.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
-           impolita.gene_te %>% filter(dist == 0) %>% nrow(),
-           impolita.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
-           yahouensis.gene_te %>% filter(dist == 0) %>% nrow(),
-           yahouensis.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
-           revolutissima.gene_te %>% filter(dist == 0) %>% nrow(),
-           revolutissima.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow(),
-           pancheri.gene_te %>% filter(dist == 0) %>% nrow(),
-           pancheri.gene_te %>% filter(dist > 0 & dist < 5000) %>% nrow()),
-           category=rep(c("0", "> 0 & < 5000"), 6),
-           species=c("sandwicensis", "sandwicensis",
-                     "vieillardii", "vieillardii",
-                     "impolita", "impolita",
-                     "yahouensis", "yahouensis",
-                     "revolutissima", "revolutissima",
-                     "pancheri", "pancheri")) %>%
+
+sample_data<-data.frame(counts=c(sandwicensis.gene_te %>% filter(gene_dist == 0) %>% nrow(), 
+           sandwicensis.gene_te %>% filter(gene_dist > 0 & gene_dist < 5000) %>% nrow(),
+           vieillardii.gene_te %>% filter(gene_dist == 0) %>% nrow(),
+           vieillardii.gene_te %>% filter(gene_dist > 0 & gene_dist < 5000) %>% nrow(),
+           impolita.gene_te %>% filter(gene_dist == 0) %>% nrow(),
+           impolita.gene_te %>% filter(gene_dist > 0 & gene_dist < 5000) %>% nrow(),
+           yahouensis.gene_te %>% filter(gene_dist == 0) %>% nrow(),
+           yahouensis.gene_te %>% filter(gene_dist > 0 & gene_dist < 5000) %>% nrow(),
+           revolutissima.gene_te %>% filter(gene_dist == 0) %>% nrow(),
+           revolutissima.gene_te %>% filter(gene_dist > 0 & gene_dist < 5000) %>% nrow(),
+           pancheri.gene_te %>% filter(gene_dist == 0) %>% nrow(),
+           pancheri.gene_te %>% filter(gene_dist > 0 & gene_dist < 5000) %>% nrow()),
+           category=rep(c("0", "1 - 5000"), 6),
+           species=c("D. sandwicensis", "D. sandwicensis",
+                     "D. vieillardii", "D. vieillardii",
+                     "D. impolita", "D. impolita",
+                     "D. yahouensis", "D. yahouensis",
+                     "D. revolutissima", "D. revolutissima",
+                     "D. pancheri", "D. pancheri")) %>%
   set_colnames(c("counts", "category", "species"))
 
 
-pdf("test.pdf")
-ggplot(sample_data, aes(category, counts, fill=category)) + 
-  #geom_boxplot()+ 
-  geom_point(aes(colour=species), size=5)+ 
-  geom_line(aes(group=species)) 
+sample_data$species <- factor(sample_data$species, levels=c("D. yahouensis",
+                                                               "D. pancheri",
+                                                               "D. impolita",
+                                                               "D. revolutissima", 
+                                                               "D. vieillardii",
+                                                               "D. sandwicensis"))
+
+
+
+distance_point<-ggplot(sample_data, aes(category, counts, fill=category)) + 
+  geom_line(aes(group=species)) +
+  geom_point(aes(colour=species), size=9) +
+  theme(legend.text = element_text(size=25, face = "italic"),
+        legend.title = element_blank(),
+        strip.text = element_text(size = 25, face="italic"),
+        axis.text.x = element_text(size=15),
+        axis.title.x = element_text(size=25),
+        axis.text.y = element_text(size=15),
+        axis.title.y = element_text(size=25)) +
+  scale_fill_discrete(guide="none") + 
+  scale_colour_manual(values=c("brown3", "cornflowerblue", "#B25D91FF", "darkolivegreen4", "darkblue", "goldenrod")) +
+  xlab("Distance from gene (bp)") +
+  ylab("Number of LTR Retrotransposons")
+
+pdf("test2.pdf", width=20, height=13)
+grid.arrange(p2, distance_point, ncol=2)
 dev.off()
+
+
 
 #############################################################
 #.    function to filter genes by their distance to a TE    #
 #############################################################
 
 
-filter_by_dist<-function(species_GO, species.gene_te, selection_statement){
-  to_return<-inner_join(species_GO, species.gene_te, by="gene") %>% 
-    arrange(gene) %>% 
-    filter(rlang::eval_tidy(rlang::parse_expr(selection_statement))) %>% 
-    dplyr::select(-c(gene))
+filter_by_dist<-function(species.gene_te, selection_statement){
+  to_return<-species.gene_te %>%
+    filter(rlang::eval_tidy(rlang::parse_expr(selection_statement)))
   return(to_return)
 }
-sand_0<-filter_by_dist(sandwicensis_GO, sandwicensis.gene_te, "dist == 0")
-vie_0<-filter_by_dist(vieillardii_GO, vieillardii.gene_te, "dist == 0")
-panc_0<-filter_by_dist(pancheri_GO, pancheri.gene_te, "dist < 1000")
-rev_0<-filter_by_dist(revolutissima_GO, revolutissima.gene_te, "dist == 0")
-yah_0<-filter_by_dist(yahouensis_GO, yahouensis.gene_te, "dist == 0")
-imp_0<-filter_by_dist(impolita_GO, impolita.gene_te, "dist == 0")
+sand_0<-filter_by_dist(sandwicensis.gene_te, "gene_dist == 0")
+vie_0<-filter_by_dist(vieillardii.gene_te, "gene_dist == 0")
+panc_0<-filter_by_dist(pancheri.gene_te, "gene_dist < 1000")
+rev_0<-filter_by_dist(revolutissima.gene_te, "gene_dist == 0")
+yah_0<-filter_by_dist(yahouensis.gene_te, "gene_dist == 0")
+imp_0<-filter_by_dist(impolita.gene_te, "gene_dist == 0")
 
-#sand_0_GO<-get_enriched_terms(sand_0$transcript, mp_sandwicensis, return_sample_GOData=TRUE)
-#vie_0_GO<-get_enriched_terms(vie_0$transcript, mp_vieillardii, return_sample_GOData=TRUE)
-#panc_0_GO<-get_enriched_terms(panc_0$transcript, mp_pancheri, return_sample_GOData=TRUE)
-#rev_0_GO<-get_enriched_terms(rev_0$transcript, mp_revolutissima, return_sample_GOData=TRUE)
-#yah_0_GO<-get_enriched_terms(yah_0$transcript, mp_yahouensis, return_sample_GOData=TRUE)
-#imp_0_GO<-get_enriched_terms(imp_0$transcript, mp_impolita, return_sample_GOData=TRUE)
+sand_0_GO<-get_enriched_terms(sand_0$gene, mp_sandwicensis, return_sample_GOData=TRUE)
+vie_0_GO<-get_enriched_terms(vie_0$gene, mp_vieillardii, return_sample_GOData=TRUE)
+panc_0_GO<-get_enriched_terms(panc_0$gene, mp_pancheri, return_sample_GOData=TRUE)
+rev_0_GO<-get_enriched_terms(rev_0$gene, mp_revolutissima, return_sample_GOData=TRUE)
+yah_0_GO<-get_enriched_terms(yah_0$gene, mp_yahouensis, return_sample_GOData=TRUE)
+imp_0_GO<-get_enriched_terms(imp_0$gene, mp_impolita, return_sample_GOData=TRUE)
 
+sand_0_GO$result %>% head(10)
+vie_0_GO$result %>% head(10)
+panc_0_GO$result %>% head(10)
+rev_0_GO$result %>% head(10)
+yah_0_GO$result %>% head(10)
+imp_0_GO$result %>% head(10)
+
+
+
+
+listInput<-list(sandwicensis = sand_0_GO$result %>% filter(classicFisher < 0.05) %>% pull(Term),
+                pancheri = panc_0_GO$result %>% filter(classicFisher < 0.05) %>% pull(Term),
+                revolutissima = rev_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term),
+                yahouensis = yah_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term),
+                impolita = imp_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term),
+                vieillardii=vie_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term))
+
+upset(fromList(listInput), order.by = "freq", nsets = 6, shade.alpha = 0.25)
+
+pdf("upset_goterms.pdf", height=10, width=17)
+ComplexUpset::upset(fromList(listInput), 
+                    c("sandwicensis", "pancheri", "revolutissima", "yahouensis", "impolita", "vieillardii"),
+                    base_annotations=list('Intersection size'=intersection_size(counts=FALSE)),
+                    themes=upset_default_themes(text=element_text(size=30)),
+                    queries=list(
+                      upset_query(set='sandwicensis', fill='dodgerblue'),
+                      upset_query(set='pancheri', fill='orchid3'),
+                      upset_query(set='revolutissima', fill='limegreen'),
+                      upset_query(set='yahouensis', fill='orchid3'),
+                      upset_query(set='impolita', fill='orchid3'),
+                      upset_query(set='vieillardii', fill='limegreen')))
+dev.off()
+
+
+
+
+Reduce(intersect, list(rev_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term),
+                       yah_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term),
+                       imp_0_GO$result  %>% filter(classicFisher < 0.05) %>% pull(Term)))
 
 
 #sand_0_GO0000373<-get_de_genes_in_term(sand_0$transcript, "GO:0000373", sand_0_GO$goData)
